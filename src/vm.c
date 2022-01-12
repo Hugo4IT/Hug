@@ -20,6 +20,7 @@ const char *getRunError(int result) {
 
 int run(AbstractSyntaxTree tree) {
     Stack stack = newStack();
+    Stack callStack = newStack();
     unsigned long executionPoint = 0;
     while (executionPoint < tree.operationCount) {
         bool moveToNextLine = true;
@@ -31,6 +32,15 @@ int run(AbstractSyntaxTree tree) {
                 break;
             case PrintStack:
                 printStringBySize(stack.data, stack.dataSize);
+                popStackWithoutBuffer(&stack, stack.stackPointer);
+                break;
+            case PushCallStack:
+                pushToStack(&callStack, (char*)executionPoint, sizeof(unsigned long));
+                executionPoint = *(unsigned long*)stack.data;
+                moveToNextLine = false;
+                break;
+            case PopCallStack:
+                popStackToBuffer(&callStack, (char*)&executionPoint, sizeof(unsigned long));
                 break;
             default: break;
         }

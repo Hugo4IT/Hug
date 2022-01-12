@@ -30,16 +30,6 @@ unsigned long getStackExpansionStepSize() {
     return stackExpansionStepSize;
 }
 
-static bool expandableStack = true;
-
-void setExpandableStack(bool value) {
-    expandableStack = value;
-}
-
-bool getExpandableStack() {
-    return expandableStack;
-}
-
 static bool shouldPanic = false;
 
 void setPanic(bool value) {

@@ -1,6 +1,14 @@
 #include "lexer.h"
 #include "config.h"
 #include <stdlib.h>
+#include <string.h>
+
+bool startsWith(char *haystack, char *needle) {
+    char ch; int i = 0;
+    while((ch = needle[i]) != '\0' && haystack[i] != '\0')
+        if (haystack[i++] != ch) return false;
+    return true;
+}
 
 Operation newEmptyOperation() {
     return (Operation){Empty, NULL, 0, 0};
@@ -28,6 +36,8 @@ AbstractSyntaxTree getAbstractSyntaxTree(char *program) {
     int i = 0; char ch = '\0';
     bool isEscaped = false;
     bool isFinished = false;
+    char operatorBuffer[40];
+    int operatorBufferIndex = 0;
     while (true) {
         Operation operation = newEmptyOperation();
         while (!isFinished) {
@@ -35,25 +45,45 @@ AbstractSyntaxTree getAbstractSyntaxTree(char *program) {
             if (ch == '\0') break;
             if (operation.operator == Empty) {
                 switch (ch) {
-                    case '+':
-                        operation.operator = PushToStack;
-                        break;
-                    case '.':
-                        operation.operator = PrintStack;
-                        isFinished = true;
+                    case '@':
+                        operation.operator = PushCallStack;
                         break;
                     case ' ':
-                    case '\n':
-                        isFinished = true;
+                        if (startsWith(&operatorBuffer[0], "push")) {
+                            operation.operator = PushToStack;
+                        } else if (startsWith(&operatorBuffer[0], "print")) {
+                            operation.operator = PrintStack;
+                            isFinished = true;
+                        } else if (startsWith(&operatorBuffer[0], "call")) {
+                            operation.operator = PushCallStack;
+                            operation.dataSize = sizeof(unsigned long);
+                            operation.data = malloc(operation.dataSize);
+                            memcpy(operation.data, (unsigned long*)&i, operation.dataSize);
+                        } else {
+                            fprintf(stderr, "[ERROR] Unrecognized operator: %s at %d\n", operatorBuffer, i);
+                            operation.operator = Empty;
+                            if (operation.dataSize > 0) {
+                                free(operation.data);
+                                operation.dataSize = 0;
+                            }
+                            isFinished = true;
+                        }
+                        // Clear buffer
+                        for (int _ = 0; _ < operatorBufferIndex; _++)
+                            operatorBuffer[--operatorBufferIndex] = 0;
                         break;
                     default:
-                        fprintf(stderr, "[ERROR] Unrecognized operator: %c at %d\n", ch, i);
-                        operation.operator = Empty;
-                        if (operation.dataSize > 0) {
-                            free(operation.data);
-                            operation.dataSize = 0;
+                        if (operatorBufferIndex >= 39) {
+                            fprintf(stderr, "[ERROR] Unrecognized operator: %s at %d\n", operatorBuffer, i);
+                            operation.operator = Empty;
+                            if (operation.dataSize > 0) {
+                                free(operation.data);
+                                operation.dataSize = 0;
+                            }
+                            isFinished = true;
+                        } else {
+                            operatorBuffer[operatorBufferIndex] = ch;
                         }
-                        isFinished = true;
                         break;
                 }
             } else {

@@ -7,14 +7,13 @@
 #include <stdlib.h>
 
 void printUsage() {
-    printf("Usage: %s [options] <INPUT_FILE>\n", PROGRAM_NAME);
-    printf("  <INPUT_FILE> | What file to run.\n\n");
+    printf("Usage:\n");
+    printf("  %s [options] <file>\n", PROGRAM_NAME);
     printf("Options:\n");
     printf("  -v,--verbose                       Verbose output, mostly useful for debugging\n");
     printf("  -h,--help                          Print this helpfully helpful helping help message\n");
     printf("  -s,--initial-stack-size <size>     Pre-allocate <size> bytes for the stack \n");
     printf("  -S,--stack-expansion-step <size>   When the stack limit is reached, allocate <size> more bytes\n");
-    printf("  -d,--dont-expand                   Don't expand the stack upon overflow, simply loop back\n");
 }
 
 bool startsWith(char *haystack, char *needle) {
@@ -32,7 +31,7 @@ void writeString(char *source, char *destination) {
 
 int main(int argc, const char** argv) {
     const char *inputFile;
-    bool hasRecievedInput = false;
+    bool hasReceivedInput = false;
 
     if (argc < 2) {
         fprintf(stderr, "[ERROR] Not enough arguments given.\n");
@@ -58,11 +57,9 @@ int main(int argc, const char** argv) {
                     previousArg = 1;
                 } else if (startsWith(currentArg, "--stack-expansion-step") || startsWith(currentArg, "-S")) {
                     previousArg = 2;
-                } else if (startsWith(currentArg, "--dont-expand") || startsWith(currentArg, "-d")) {
-                    setExpandableStack(false);
                 } else {
                     inputFile = currentArg;
-                    hasRecievedInput = true;
+                    hasReceivedInput = true;
                 }
             } else {
                 switch (previousArg) {
@@ -84,7 +81,7 @@ int main(int argc, const char** argv) {
         }
     }
 
-    if (inputFile == NULL || !hasRecievedInput) {
+    if (inputFile == NULL || !hasReceivedInput) {
         fprintf(stderr, "[ERROR] No input file given\n");
         printUsage();
         return EXIT_FAILURE;
@@ -93,7 +90,10 @@ int main(int argc, const char** argv) {
     printVerbose("Verbose output enabled.\n");
 
     char *fileContents = getFileContents(inputFile);
-    if (fileContents == NULL) return EXIT_FAILURE;
+    if (fileContents == NULL) {
+        fprintf(stderr, "[ERROR] Couldn't read file %s", inputFile);
+        return EXIT_FAILURE;
+    }
 
     printVerbose("\n---File content---\n\n%s\n\n------------------\n\n", fileContents);
 

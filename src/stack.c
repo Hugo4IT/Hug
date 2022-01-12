@@ -6,17 +6,32 @@ Stack newStack() {
     return (Stack) {getInitialStackSize(), 0, malloc(getInitialStackSize())};
 }
 
-void pushToStack(Stack *stack, char *data, unsigned long dataLength) {
-    for (unsigned long i = 0; i < dataLength; i++) {
+void pushToStack(Stack *stack, char *data, unsigned long dataSize) {
+    for (unsigned long i = 0; i < dataSize; i++) {
         while (stack->stackPointer >= stack->dataSize) {
-            if (getExpandableStack()) {
-                stack->dataSize += getStackExpansionStepSize();
-                stack->data = realloc(stack->data, stack->dataSize);
-            } else
-                stack->stackPointer = 0;
+            stack->dataSize += getStackExpansionStepSize();
+            stack->data = realloc(stack->data, stack->dataSize);
         }
         stack->data[stack->stackPointer++] = data[i];
     }
+}
+
+void popStackWithoutBuffer(Stack *stack, unsigned long dataSize) {
+    for (unsigned long i = 0; i < dataSize; i++)
+        stack->data[--stack->stackPointer] = 0;
+}
+
+void popStackToBuffer(Stack *stack, char *buffer, unsigned long dataSize) {
+    for (unsigned long i = 0; i < dataSize; i++) {
+        buffer[i] = stack->data[--stack->stackPointer];
+        stack->data[stack->stackPointer] = 0;
+    }
+}
+
+char *popStack(Stack *stack, unsigned long dataSize) {
+    char *data = malloc(dataSize);
+    popStackToBuffer(stack, data, dataSize);
+    return data;
 }
 
 char *getStackSlice(Stack *stack, unsigned long from, unsigned long to) {
