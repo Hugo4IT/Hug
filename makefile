@@ -1,5 +1,5 @@
 CC = gcc
-CCFLAGS = -Wall -Wextra -Iinc
+CCFLAGS = -Wall -Wextra
 BINARY = bin/main
 
 SOURCES = $(wildcard src/*.c)
