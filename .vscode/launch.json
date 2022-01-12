@@ -1,0 +1,16 @@
+{
+    "version": "4",
+    "configurations": [
+        {
+            "name": "Debug",
+            "type": "lldb",
+            "request": "launch",
+            "preLaunchTask": "Make Debug",
+            "program": "bin/main.debug",
+            "args": [
+                "test/prog.makr",
+                "--verbose"
+            ]
+        }
+    ]
+}

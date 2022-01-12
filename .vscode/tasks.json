@@ -1,0 +1,61 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Make Clean",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "clean"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Generate compile_commands.json",
+            "type": "shell",
+            "command": "bear",
+            "args": [
+                "--",
+                "make"
+            ],
+            "dependsOn": [
+                "Make Clean"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Make Debug",
+            "type": "shell",
+            "problemMatcher": "$msCompile",
+            "command": "make"
+        },
+        {
+            "label": "Make Release",
+            "type": "shell",
+            "problemMatcher": "$msCompile",
+            "command": "make",
+            "args": [
+                "release"
+            ],
+        },
+        {
+            "label": "Strip Release",
+            "type": "shell",
+            "command": "strip",
+            "args": [
+                "bin/main.release"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Release",
+            "dependsOn": [
+                "Make Clean",
+                "Make Release",
+                "Strip Release"
+            ],
+            "dependsOrder": "sequence",
+            "problemMatcher": []
+        }
+    ]
+}
