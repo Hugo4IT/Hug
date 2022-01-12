@@ -3,7 +3,9 @@
 #include "lexer.h"
 #include "fileio.h"
 #include "config.h"
+#include "strings.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 
 void printUsage() {
@@ -14,13 +16,6 @@ void printUsage() {
     printf("  -h,--help                          Print this helpfully helpful helping help message\n");
     printf("  -s,--initial-stack-size <size>     Pre-allocate <size> bytes for the stack \n");
     printf("  -S,--stack-expansion-step <size>   When the stack limit is reached, allocate <size> more bytes\n");
-}
-
-bool startsWith(char *haystack, char *needle) {
-    char ch; int i = 0;
-    while((ch = needle[i]) != '\0' && haystack[i] != '\0')
-        if (haystack[i++] != ch) return false;
-    return true;
 }
 
 void writeString(char *source, char *destination) {
@@ -91,23 +86,45 @@ int main(int argc, const char** argv) {
 
     char *fileContents = getFileContents(inputFile);
     if (fileContents == NULL) {
-        fprintf(stderr, "[ERROR] Couldn't read file %s", inputFile);
+        fprintf(stderr, "[ERROR] Couldn't read file %s\n", inputFile);
         return EXIT_FAILURE;
     }
 
-    printVerbose("\n---File content---\n\n%s\n\n------------------\n\n", fileContents);
+    printVerbose("File content:\n%s\n", fileContents);
 
     AbstractSyntaxTree tree = getAbstractSyntaxTree(fileContents);
 
-    printVerbose("\n------script------\n\n");
+    if (getVerbose()) {
+        printf("\nExpanded program:\n");
+        for (unsigned long i = 0; i < tree.operationCount; i++) {
+            printf("| ");
+            Operation operation = tree.operations[i];
+            switch (operation.operator) {
+                case Empty: printf("noop"); break;
+                case PushToStack:
+                    printf("push \"");
+                    for (unsigned long i = 0; i < operation.dataLength; i++) {
+                        printf("%c", operation.data[i]);
+                    }
+                    printf("\"");
+                    break;
+                case PrintStack: printf("print"); break;
+                case PushCallStack:
+                    printf("jump $%lu", (unsigned long)operation.data);
+                    break;
+                case PopCallStack: printf("return"); break;
+                case Function: printf("@addr $%lu", i); break;
+            }
+            printf("\n");
+        }
+    }
+
+    printVerbose("\n------------\n\n");
 
     int result = run(tree);
     if (result != Success) {
         fprintf(stderr, "[ERROR]: %s\n", getRunError(result));
     }
-
-    printVerbose("\n------------------\n\n");
-
 
     destroyAbstractSyntaxTree(&tree);
     free(fileContents);

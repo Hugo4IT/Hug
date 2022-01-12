@@ -1,0 +1,7 @@
+@printHelloWorld {
+    push "Hello, World!\n"
+    print
+}
+
+call @printHelloWorld
+push "Second message"

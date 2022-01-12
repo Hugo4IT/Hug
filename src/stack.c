@@ -1,9 +1,10 @@
 #include "stack.h"
 #include "config.h"
-#include <stdlib.h>
 
 Stack newStack() {
-    return (Stack) {getInitialStackSize(), 0, malloc(getInitialStackSize())};
+    char *data = malloc(getInitialStackSize());
+    for (unsigned long i = 0; i < getInitialStackSize(); i++) data[i] = '\0';
+    return (Stack) {getInitialStackSize(), 0, data};
 }
 
 void pushToStack(Stack *stack, char *data, unsigned long dataSize) {
@@ -22,10 +23,9 @@ void popStackWithoutBuffer(Stack *stack, unsigned long dataSize) {
 }
 
 void popStackToBuffer(Stack *stack, char *buffer, unsigned long dataSize) {
-    for (unsigned long i = 0; i < dataSize; i++) {
-        buffer[i] = stack->data[--stack->stackPointer];
-        stack->data[stack->stackPointer] = 0;
-    }
+    stack->stackPointer -= dataSize;
+    for (unsigned long i = 0; i < dataSize; i++)
+        buffer[i] = stack->data[stack->stackPointer + i];
 }
 
 char *popStack(Stack *stack, unsigned long dataSize) {

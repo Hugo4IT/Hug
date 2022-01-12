@@ -7,6 +7,7 @@
         "**/.DS_Store": true,
         "**/Thumbs.db": true,
         "**/.cache": true,
-        "**/compile_commands.json": true
-    }
+    },
+    "clangd.semanticHighlighting": true,
+    "editor.semanticHighlighting.enabled": true
 }

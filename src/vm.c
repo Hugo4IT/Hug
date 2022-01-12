@@ -1,4 +1,5 @@
 #include "vm.h"
+#include "lexer.h"
 #include "stack.h"
 
 void printStringBySize(char *string, unsigned long size) {
@@ -28,19 +29,23 @@ int run(AbstractSyntaxTree tree) {
         Operation operation = tree.operations[executionPoint];
         switch (operation.operator) {
             case PushToStack:
-                pushToStack(&stack, operation.data, operation.dataLength);
+                pushToStack(&stack, operation.data, operation.dataSize);
                 break;
             case PrintStack:
                 printStringBySize(stack.data, stack.dataSize);
                 popStackWithoutBuffer(&stack, stack.stackPointer);
                 break;
             case PushCallStack:
-                pushToStack(&callStack, (char*)executionPoint, sizeof(unsigned long));
-                executionPoint = *(unsigned long*)stack.data;
-                moveToNextLine = false;
+                pushToStack(&callStack, (char*)&executionPoint, sizeof(unsigned long));
+                executionPoint = (unsigned long)operation.data;
+                moveToNextLine = true;
                 break;
             case PopCallStack:
                 popStackToBuffer(&callStack, (char*)&executionPoint, sizeof(unsigned long));
+                moveToNextLine = true;
+                break;
+            case Function:
+                while (tree.operations[++executionPoint].operator != PopCallStack);
                 break;
             default: break;
         }

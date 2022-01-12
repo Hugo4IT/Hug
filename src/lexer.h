@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <memory.h>
+#include "strings.h"
 
 #define MEMORY_EXPANSION_STEP 40
 
@@ -14,7 +15,8 @@ enum Operators {
     PushToStack,
     PrintStack,
     PushCallStack,
-    PopCallStack
+    PopCallStack,
+    Function
 };
 
 typedef struct Operation {

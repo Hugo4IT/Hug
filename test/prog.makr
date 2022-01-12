@@ -1,7 +1,11 @@
-@printHelloWorld {
-    push "Hello, World!\n"
+@prHelloWorld {
+    push "Hello, World!"
     print
 }
 
-call @printHelloWorld
+call @prHelloWorld
 push "Second message"
+print
+call @prHelloWorld
+push "Third message"
+print
