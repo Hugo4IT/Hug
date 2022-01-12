@@ -1,6 +1,6 @@
 CC = gcc
 CCFLAGS = -Wall -Wextra
-BINARY = bin/main
+BINARY = bin/makr
 
 SOURCES = $(wildcard src/*.c)
 OBJECTS = $(patsubst src/%.c,bin/%.o,$(SOURCES))
@@ -10,11 +10,11 @@ DEPENDS = $(patsubst src/%.c,bin/%.d,$(SOURCES))
 default: debug
 
 debug: CCFLAGS += -g3 -O0
-debug: BINARY = bin/main.debug
+debug: BINARY = bin/makr.debug
 debug: build
 
 release: CCFLAGS += -O3 -g0
-release: BINARY = bin/main.release
+release: BINARY = bin/makr.release
 release: build
 
 clean:

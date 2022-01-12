@@ -6,7 +6,7 @@
             "type": "lldb",
             "request": "launch",
             "preLaunchTask": "Make Debug",
-            "program": "bin/main.debug",
+            "program": "bin/makr.debug",
             "args": [
                 "test/prog.makr",
                 "--verbose"

@@ -87,6 +87,7 @@ int main(int argc, const char** argv) {
     char *fileContents = getFileContents(inputFile);
     if (fileContents == NULL) {
         fprintf(stderr, "[ERROR] Couldn't read file %s\n", inputFile);
+        printUsage();
         return EXIT_FAILURE;
     }
 

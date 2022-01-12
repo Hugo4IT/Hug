@@ -2,7 +2,7 @@
 
 #include "bool.h"
 
-#define PROGRAM_NAME "main"
+#define PROGRAM_NAME "makr"
 #define printVerbose if(getVerbose()) printf
 
 // Logging
