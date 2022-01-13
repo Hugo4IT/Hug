@@ -5,10 +5,14 @@ function depressing {
 }
 
 call printHelloWorld
-push "Second message"
+push "Second"
+push " "
+push "message."
 print
 call printHelloWorld
-push "Third message"
+push "Third message."
 print
 call depressing
-call depressing
+call printHelloWorld
+push "The End"
+print

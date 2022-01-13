@@ -4,23 +4,32 @@ This programming language is not really made for actual use, just me experimenti
 
 ## Example
 
-This is an example featuring all current features (taken from `test/call-stack.prog`):
+This is an example featuring all current features (taken from `test/prog.makr`):
 
 ```hs
-@prHelloWorld {
-    push "Hello, World!"
+function printHelloWorld{push "Hello, World!" print}
+function depressing {
+    push "Goodbye, World..."
     print
 }
 
-call @prHelloWorld
-push "Second message"
+call printHelloWorld
+push "Second"
+push " "
+push "message."
 print
-call @prHelloWorld
-push "Third message"
+call printHelloWorld
+push "Third message."
+print
+call depressing
+call printHelloWorld
+push "The End"
 print
 ```
 
 I wanted to add some comments to the code to explain what it does, but the language doesn't support that yet :/
+
+To run all tests (unix only), run `make clean release && ./test.sh`. This will run all the tests and prints the total amount of time it took to run them.
 
 ## Usage
 

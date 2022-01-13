@@ -1,0 +1,1 @@
+time for f in test/*.makr; do bin/makr.release $f; done

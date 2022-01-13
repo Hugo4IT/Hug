@@ -12,3 +12,13 @@ push "Third message"
 print
 call depressing
 call depressing
+call depressing
+call depressing
+call depressing
+call depressing
+call depressing
+call depressing
+call depressing
+call printHelloWorld
+push "The End"
+print
