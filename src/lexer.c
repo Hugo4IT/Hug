@@ -1,5 +1,18 @@
 #include "lexer.h"
 
+const char DELIMITERS[] = {'{', '}', '(', ')'};
+const char DELIMITER_COUNT = 6;
+
+bool isDelimiter(char ch) {
+    for (int i = 0; i < DELIMITER_COUNT; i++)
+        if (ch == DELIMITERS[i]) return true;
+    return false;
+}
+
+bool isWhitespcace(char ch) {
+    return ch == ' ' || ch == '\n';
+}
+
 typedef struct MappedAddress {
     char *name;
     unsigned long location;
@@ -79,8 +92,8 @@ char getNextCharacter(ScriptReader *reader) {
 
 char *getNextSymbol(ScriptReader *reader) {
     char ch = reader->script[reader->index];
-    while (ch == ' ' || ch == '\n') ch = getNextCharacter(reader);
-    while (ch != ' ' && ch != '\n' && ch != '\0' && ch != EOF) {
+    while (isWhitespcace(ch)) ch = getNextCharacter(reader);
+    while (!isDelimiter(ch) && !isWhitespcace(ch) && ch != '\0' && ch != EOF) {
         if (ch == '"') { // Strings
             ch = getNextCharacter(reader);
             while (ch != '"') {
@@ -91,6 +104,9 @@ char *getNextSymbol(ScriptReader *reader) {
         } else {
             pushReaderBuffer(reader, ch);
             ch = getNextCharacter(reader);
+
+            // Move back one character, so the main run() loop will find it in "ch"
+            if (isDelimiter(ch)) reader->index--;
         }
     }
 
@@ -141,7 +157,7 @@ AbstractSyntaxTree getAbstractSyntaxTree(char *program) {
                     operation.operator = PushCallStack;
                     operation.data = (char*)getAddress(&mapping, nextSymbol);
                     free(nextSymbol);
-                } else if (strcmp(symbol, "}") == 0) {
+                } else if (ch == '}') {
                     operation.operator = PopCallStack;
                 }
                 
@@ -166,7 +182,7 @@ AbstractSyntaxTree getAbstractSyntaxTree(char *program) {
 
 void destroyAbstractSyntaxTree(AbstractSyntaxTree *tree) {
     for (unsigned long i = 0; i < tree->operationCount; i++)
-        if (tree->operations[i].data)
+        if (tree->operations[i].operator == PushToStack)
             free(tree->operations[i].data);
     free(tree->operations);
 }

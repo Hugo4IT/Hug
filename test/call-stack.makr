@@ -1,11 +1,14 @@
-@prHelloWorld {
-    push "Hello, World!"
+function printHelloWorld{push "Hello, World!" print}
+function depressing {
+    push "Goodbye, World..."
     print
 }
 
-call @prHelloWorld
+call printHelloWorld
 push "Second message"
 print
-call @prHelloWorld
+call printHelloWorld
 push "Third message"
 print
+call depressing
+call depressing

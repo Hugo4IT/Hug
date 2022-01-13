@@ -45,6 +45,7 @@ int run(AbstractSyntaxTree tree) {
                 moveToNextLine = true;
                 break;
             case Function:
+                // Await "}"
                 while (tree.operations[++executionPoint].operator != PopCallStack);
                 break;
             default: break;
@@ -52,6 +53,7 @@ int run(AbstractSyntaxTree tree) {
 
         if (getPanic()) {
             destroyStack(&stack);
+            destroyStack(&callStack);
             return RuntimeError;
         }
         if (moveToNextLine) executionPoint++;
