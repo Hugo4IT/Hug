@@ -84,7 +84,7 @@ int main(int argc, const char** argv) {
 
     printVerbose("Verbose output enabled.\n");
 
-    char *fileContents = getFileContents(inputFile);
+    char *fileContents = getFileContents(inputFile); // freed in getAbstractSyntaxTree()
     if (fileContents == NULL) {
         fprintf(stderr, "[ERROR] Couldn't read file %s\n", inputFile);
         printUsage();
@@ -103,11 +103,7 @@ int main(int argc, const char** argv) {
             switch (operation.operator) {
                 case Empty: printf("noop"); break;
                 case PushToStack:
-                    printf("push \"");
-                    for (unsigned long i = 0; i < operation.dataLength; i++) {
-                        printf("%c", operation.data[i]);
-                    }
-                    printf("\"");
+                    printf("push \"%s\"", operation.data);
                     break;
                 case PrintStack: printf("print"); break;
                 case PushCallStack:
@@ -128,6 +124,5 @@ int main(int argc, const char** argv) {
     }
 
     destroyAbstractSyntaxTree(&tree);
-    free(fileContents);
     return EXIT_SUCCESS;
 }

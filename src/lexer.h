@@ -2,11 +2,12 @@
 
 #include "bool.h"
 #include "config.h"
+#include "strings.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <memory.h>
-#include "strings.h"
+#include <string.h>
 
 #define MEMORY_EXPANSION_STEP 40
 
@@ -22,8 +23,6 @@ enum Operators {
 typedef struct Operation {
     char operator;
     char *data;
-    unsigned long dataSize;
-    unsigned long dataLength;
 } Operation;
 
 typedef struct AbstractSyntaxTree {

@@ -1,11 +1,11 @@
-@prHelloWorld {
+function @printHelloWorld {
     push "Hello, World!"
     print
 }
 
-call @prHelloWorld
+call @printHelloWorld
 push "Second message"
 print
-call @prHelloWorld
+call @printHelloWorld
 push "Third message"
 print

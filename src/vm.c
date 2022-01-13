@@ -29,7 +29,7 @@ int run(AbstractSyntaxTree tree) {
         Operation operation = tree.operations[executionPoint];
         switch (operation.operator) {
             case PushToStack:
-                pushToStack(&stack, operation.data, operation.dataSize);
+                pushToStack(&stack, operation.data, strlen(operation.data));
                 break;
             case PrintStack:
                 printStringBySize(stack.data, stack.dataSize);
@@ -58,5 +58,6 @@ int run(AbstractSyntaxTree tree) {
     }
     
     destroyStack(&stack);
+    destroyStack(&callStack);
     return Success;
 }

@@ -1,6 +1,4 @@
 #include "lexer.h"
-#include "config.h"
-#include <stdlib.h>
 
 typedef struct MappedAddress {
     char *name;
@@ -12,26 +10,41 @@ typedef struct AddressMap {
     unsigned long mapCount;
 } AddressMap;
 
-AddressMap newAdressMap() {
+typedef struct ScriptReader {
+    unsigned long index;
+    char *script;
+    unsigned long bufferLength;
+    unsigned long bufferSize;
+    char *buffer;
+} ScriptReader;
+
+AddressMap newAddressMap() {
     return (AddressMap){NULL, 0};
 }
 
-void mapAddress(AddressMap *mapping, char name[39], unsigned long location) {
+void mapAddress(AddressMap *mapping, char* name, unsigned long location) {
     mapping->maps = realloc(mapping->maps, ++mapping->mapCount * sizeof(MappedAddress));
     mapping->maps[mapping->mapCount-1] = (MappedAddress){name, location};
 }
 
-unsigned long getAddress(AddressMap *mapping, char name[40]) {
+unsigned long getAddress(AddressMap *mapping, char *name) {
     for (unsigned long i = 0; i < mapping->mapCount; i++)
-        if (stringEquals(mapping->maps[i].name, name))
+        if (strcmp(mapping->maps[i].name, name) == 0)
             return mapping->maps[i].location;
+    free(name);
 
     fprintf(stderr, "[ERROR]: Could not find symbol %s in mapped addressed. Check if the name matches the target function/variable.\n", name);
     return 0;
 }
 
+void destroyAddressMap(AddressMap *mapping) {
+    for (unsigned long i = 0; i < mapping->mapCount; i++)
+        free(mapping->maps[i].name);
+    free(mapping->maps);
+}
+
 Operation newEmptyOperation() {
-    return (Operation){Empty, NULL, 0, 0};
+    return (Operation){Empty, NULL};
 }
 
 void pushOperation(AbstractSyntaxTree *tree, Operation symbol) {
@@ -42,124 +55,107 @@ void pushOperation(AbstractSyntaxTree *tree, Operation symbol) {
     tree->operations[tree->operationCount++] = symbol;
 }
 
-void pushCharacter(Operation *operation, char ch) {
-    while (operation->dataLength >= operation->dataSize) {
-        operation->dataSize += MEMORY_EXPANSION_STEP;
-        operation->data = realloc(operation->data, operation->dataSize);
+ScriptReader newReader(char *program) {
+    return (ScriptReader){0, program, 0, 1024, malloc(1024)};
+}
+
+void pushReaderBuffer(ScriptReader *reader, char ch) {
+    if (reader->bufferSize <= reader->bufferLength) {
+        reader->bufferSize += 1024;
+        reader->buffer = realloc(reader->buffer, reader->bufferSize);
     }
-    operation->data[operation->dataLength++] = ch;
+    reader->buffer[reader->bufferLength++] = ch;
+}
+
+void clearReaderBuffer(ScriptReader *reader) {
+    for (unsigned long i = 0; i < reader->bufferLength; i++)
+        reader->buffer[i] = '\0';
+    reader->bufferLength = 0;
+}
+
+char getNextCharacter(ScriptReader *reader) {
+    return reader->script[++reader->index];
+}
+
+char *getNextSymbol(ScriptReader *reader) {
+    char ch = reader->script[reader->index];
+    while (ch == ' ' || ch == '\n') ch = getNextCharacter(reader);
+    while (ch != ' ' && ch != '\n' && ch != '\0' && ch != EOF) {
+        if (ch == '"') { // Strings
+            ch = getNextCharacter(reader);
+            while (ch != '"') {
+                pushReaderBuffer(reader, ch);
+                ch = getNextCharacter(reader);
+            }
+            break;
+        } else {
+            pushReaderBuffer(reader, ch);
+            ch = getNextCharacter(reader);
+        }
+    }
+
+    // Copy readable part of reader->buffer and append with nul terminator
+    char *symbolBuffer = malloc(reader->bufferLength + 1);
+    for (unsigned long i = 0; i < reader->bufferLength; i++)
+        symbolBuffer[i] = reader->buffer[i];
+    symbolBuffer[reader->bufferLength] = '\0';
+
+    clearReaderBuffer(reader);
+
+    return symbolBuffer;
+}
+
+void destroyReader(ScriptReader *reader) {
+    free(reader->script);
+    free(reader->buffer);
 }
 
 AbstractSyntaxTree getAbstractSyntaxTree(char *program) {
     AbstractSyntaxTree tree = (AbstractSyntaxTree){0UL, 0UL, NULL};
-    AddressMap mapping = newAdressMap();
+    ScriptReader reader = newReader(program);
+    AddressMap mapping = newAddressMap();
 
-    int i = 0; char ch = '\0';
-    bool isEscaped = false;
-    bool isFinished = false;
-    bool awaitWord = false;
-    char operatorBuffer[40];
-    for (int i = 0; i < 40; i++) operatorBuffer[i] = '\0';
-    int operatorBufferIndex = 0;
-    while (true) {
-        Operation operation = newEmptyOperation();
-        while (!isFinished) {
-            ch = program[i++];
-            if (operation.operator == Empty || awaitWord) {
-                switch (ch) {
-                    case '@':
-                        if (operation.operator == Empty)
-                            operation.operator = Function;
-                        awaitWord = true;
-                        break;
-                    case '}':
-                        operation.operator = PopCallStack;
-                        isFinished = true;
-                        break;
-                    case '{':
-                    case ' ':
-                    case '\n':
-                    case EOF:
-                    case '\0':
-                        awaitWord = false;
+    bool exitLoop = false;
+    char ch = '\n';
+    while (!exitLoop) {
+        switch (ch) {
+            case '\0':
+            case EOF:
+                exitLoop = true;
+                break;
+            default:
+                {} // Clangd be annoying :/
+                char *symbol = getNextSymbol(&reader);
+                Operation operation = newEmptyOperation();
 
-                        if (operation.operator == Function) {
-                            mapAddress(&mapping, &operatorBuffer[1], tree.operationCount); // Start from index 1 to remove "@"
-                            isFinished = true;
-                        } else if (operation.operator == PushCallStack) {
-                            operation.data = (char*)getAddress(&mapping, &operatorBuffer[0]);
-                            isFinished = true;
-                        } else if (startsWith(&operatorBuffer[0], "push")) {
-                            operation.operator = PushToStack;
-                        } else if (startsWith(&operatorBuffer[0], "print")) {
-                            operation.operator = PrintStack;
-                            isFinished = true;
-                        } else if (startsWith(&operatorBuffer[0], "call")) {
-                            operation.operator = PushCallStack;
-                            awaitWord = true;
-                        } else if (operatorBuffer[0] != '\0') {
-                            fprintf(stderr, "[ERROR] Unrecognized operator: %s at %d/%d\n", operatorBuffer, i, __LINE__);
-                            operation.operator = Empty;
-                            if (operation.dataSize > 0) {
-                                free(operation.data);
-                                operation.dataSize = 0;
-                            }
-                        }
-                        // Clear buffer
-                        for (int i = 0; i < operatorBufferIndex; i++)
-                            operatorBuffer[i] = '\0';
-                        operatorBufferIndex = 0;
-                        break;
-                    default:
-                        if (operatorBufferIndex >= 39) {
-                            fprintf(stderr, "[ERROR] Unrecognized operator: %s at %d/%d\n", operatorBuffer, i, __LINE__);
-                            operation.operator = Empty;
-                            if (operation.dataSize > 0) {
-                                free(operation.data);
-                                operation.dataSize = 0;
-                            }
-                            isFinished = true;
-                        } else operatorBuffer[operatorBufferIndex++] = ch;
-                        break;
+                if (strcmp(symbol, "function") == 0) {
+                    mapAddress(&mapping, getNextSymbol(&reader), tree.operationCount);
+                    operation.operator = Function;
+                } else if (strcmp(symbol, "push") == 0) {
+                    operation.operator = PushToStack;
+                    operation.data = getNextSymbol(&reader);
+                } else if (strcmp(symbol, "print") == 0) {
+                    operation.operator = PrintStack;
+                } else if (strcmp(symbol, "call") == 0) {
+                    char *nextSymbol = getNextSymbol(&reader);
+                    operation.operator = PushCallStack;
+                    operation.data = (char*)getAddress(&mapping, nextSymbol);
+                    free(nextSymbol);
+                } else if (strcmp(symbol, "}") == 0) {
+                    operation.operator = PopCallStack;
                 }
-            } else {
-                switch (operation.operator) {
-                    case PushToStack:
-                        if (!isEscaped) {
-                            if (ch == '\\') isEscaped = true;
-                            else {
-                                if (ch == '\"') {
-                                    if (operation.dataSize != 0) {
-                                        operation.dataSize = operation.dataLength + 1;
-                                        operation.data = realloc(operation.data, operation.dataSize);
-                                        operation.data[operation.dataLength] = '\0';
-                                        isFinished = true;
-                                    }
-                                } else {
-                                    pushCharacter(&operation, ch);
-                                }
-                            }
-                        } else {
-                            if (ch == '"' || ch == '\'')
-                                pushCharacter(&operation, ch);
-                            else if (ch == 'n') {
-                                pushCharacter(&operation, '\n');
-                            } 
-                            printVerbose("Escaped character: %c\n", ch);
-                            isEscaped = false;
-                        }
-                        break;
-                }
-            }
-
-            if (ch == '\0') break;
+                
+                free(symbol);
+                if (operation.operator != Empty)
+                    pushOperation(&tree, operation);
+                break;
         }
-
-        if (operation.operator != Empty)
-            pushOperation(&tree, operation);
-        isFinished = false;
-        if (ch == '\0' || ch == EOF) break;
+        
+        ch = getNextCharacter(&reader);
     }
+
+    destroyReader(&reader);
+    destroyAddressMap(&mapping);
 
     // Shrink back down
     tree.operationHolderSize = sizeof(Operation) * tree.operationCount;
@@ -170,7 +166,7 @@ AbstractSyntaxTree getAbstractSyntaxTree(char *program) {
 
 void destroyAbstractSyntaxTree(AbstractSyntaxTree *tree) {
     for (unsigned long i = 0; i < tree->operationCount; i++)
-        if (tree->operations[i].dataSize)
+        if (tree->operations[i].data)
             free(tree->operations[i].data);
     free(tree->operations);
 }

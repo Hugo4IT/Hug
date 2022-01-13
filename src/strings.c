@@ -9,10 +9,3 @@ bool startsWith(char *haystack, char *needle) {
         i++;
     }
 }
-
-bool stringEquals(char *left, char *right) {
-    int i = 0;
-    while(right[i] == left[i])
-        if (left[i++] == '\0') return false;
-    return true;
-}
