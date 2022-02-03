@@ -1,15 +1,15 @@
-function printHelloWorld{push "Hello, World!" print}
+function printHelloWorld{push "Hello, World!" call print}
 function depressing {
     push "Goodbye, World..."
-    print
+    call print
 }
 
 call printHelloWorld
 push "Second message"
-print
+call print
 call printHelloWorld
 push "Third message"
-print
+call print
 call depressing
 call depressing
 call depressing
@@ -21,4 +21,4 @@ call depressing
 call depressing
 call printHelloWorld
 push "The End"
-print
+call print

@@ -1,6 +1,8 @@
-bin/*
-.sconsign.dblite
+**/.sconsign.dblite
 **/*.o
 **/.DS_Store
 **/.cache
+**/bin
+**/.vscode
+test.sh
 compile_commands.json

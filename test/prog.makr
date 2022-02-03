@@ -1,18 +1,2 @@
-function printHelloWorld{push "Hello, World!" print}
-function depressing {
-    push "Goodbye, World..."
-    print
-}
-
-call printHelloWorld
-push "Second"
-push " "
-push "message."
-print
-call printHelloWorld
-push "Third message."
-print
-call depressing
-call printHelloWorld
-push "The End"
-print
+var number = 70;
+//var text: char[] = "Hello, World!"

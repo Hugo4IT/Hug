@@ -1,1 +1,1 @@
-time for f in test/*.makr; do bin/makr.release $f; done
+watch -n 1 "make debug -B && bin/makr.debug test/prog.makr"

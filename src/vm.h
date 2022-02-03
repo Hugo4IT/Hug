@@ -2,12 +2,6 @@
 
 #include "stack.h"
 #include "lexer.h"
-#include "config.h"
+#include "instruction.h"
 
-enum RunError {
-    Success,
-    RuntimeError
-};
-
-const char *getRunError(int result);
-int run(AbstractSyntaxTree tree);
+int runScript(Script *tree);

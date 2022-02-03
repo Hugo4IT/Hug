@@ -9,7 +9,7 @@ DEPENDS = $(patsubst src/%.c,bin/%.d,$(SOURCES))
 .PHONY: default
 default: debug
 
-debug: CCFLAGS += -g3 -O0
+debug: CCFLAGS += -g3 -O0 -Wno-unused-parameter
 debug: BINARY = bin/makr.debug
 debug: build
 

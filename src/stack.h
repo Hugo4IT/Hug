@@ -1,20 +1,14 @@
 #pragma once
 
-#include "config.h"
-
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 typedef struct Stack {
-    unsigned long dataSize;
-    unsigned long stackPointer; // Current position in the stack
-    char *data;
+    uint8_t *data;
 } Stack;
 
-Stack newStack();
-void pushToStack(Stack *stack, char *data, unsigned long dataSize);
-void popStackWithoutBuffer(Stack *stack, unsigned long dataSize);
-void popStackToBuffer(Stack *stack, char *buffer, unsigned long dataSize);
-char *popStack(Stack *stack, unsigned long dataSize);
-char *getStackSlice(Stack *stack, unsigned long from, unsigned long to);
+Stack newStack(uint32_t size);
+void writeStack(Stack *stack, uint32_t position, uint8_t *data, uint32_t dataSize);
+void readStack(Stack *stack, uint32_t position, uint32_t dataSize, uint8_t *buffer);
 void destroyStack(Stack *stack);
