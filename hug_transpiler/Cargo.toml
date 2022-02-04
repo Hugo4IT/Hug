@@ -8,4 +8,4 @@ edition = "2021"
 [dependencies]
 hug_std = { path = "../hug_std" }
 hug_lib = { path = "../hug_lib" }
-hug_tokenizer = { path = "../hug_tokenizer" }
+hug_lexer = { path = "../hug_lexer" }

@@ -1,5 +1,5 @@
 use hug_lib::Script;
-use hug_tokenizer::Tokenizer;
+use hug_lexer::tokenizer::Tokenizer;
 
 #[derive(Debug, Clone)]
 pub enum Variable {

@@ -83,6 +83,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "hug_lexer"
+version = "0.1.0"
+dependencies = [
+ "unic-emoji-char",
+]
+
+[[package]]
 name = "hug_lib"
 version = "0.1.0"
 
@@ -94,19 +101,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "hug_tokenizer"
-version = "0.1.0"
-dependencies = [
- "unic-emoji-char",
-]
-
-[[package]]
 name = "hug_transpiler"
 version = "0.1.0"
 dependencies = [
+ "hug_lexer",
  "hug_lib",
  "hug_std",
- "hug_tokenizer",
 ]
 
 [[package]]

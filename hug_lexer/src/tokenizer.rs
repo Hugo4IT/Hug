@@ -1,5 +1,7 @@
 use std::str::Chars;
 
+type TokenList = Vec<Token>;
+
 #[derive(Debug, Clone, Copy)]
 pub struct Token {
     pub kind: TokenKind,
@@ -194,7 +196,8 @@ impl<'a> Tokenizer<'a> {
             match c {
                 '\\' => is_escaped = true,
                 '"' if !is_escaped => break,
-                _ => ()
+                _ if is_escaped => is_escaped = false,
+                _ => (),
             }
         }
         TokenKind::Literal(LiteralKind::String)
@@ -402,21 +405,12 @@ impl<'a> Tokenizer<'a> {
         }
     }
 
-    pub fn tokenize(mut self) -> Vec<Token> {
-        let mut tokens = Vec::new();
+    pub fn tokenize(mut self) -> TokenList {
+        let mut tokens = TokenList::new();
         while !self.is_eof() {
             self.reset_consumed_len();
             tokens.push(self.next_token());
         }
         tokens
-    }
-}
-
-pub fn run_test(program: &str, expected_result: &[(TokenKind, usize)]) {
-    let tokens = Tokenizer::new(program).tokenize();
-    for (token, (expected_kind, expected_len)) in tokens.iter().zip(expected_result.iter()) {
-        println!("Token: {:?}, Expected: {:?}, len: {}", *token, expected_kind, expected_len);
-        assert_eq!(token.kind, *expected_kind);
-        assert_eq!(token.len, *expected_len);
     }
 }

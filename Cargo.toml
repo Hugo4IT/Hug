@@ -1,7 +1,7 @@
 [workspace]
 members = [
+    "hug_lexer",
     "hug_compiler",
-    "hug_tokenizer",
     "hug_transpiler",
     "hug_interpreter",
     "hug_std",
