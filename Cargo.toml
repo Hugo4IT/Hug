@@ -1,0 +1,9 @@
+[workspace]
+members = [
+    "makr_compiler",
+    "makr_transpiler",
+    "makr_interpreter",
+    "makr_std",
+    "makr_lib",
+    "makr_bin"
+]

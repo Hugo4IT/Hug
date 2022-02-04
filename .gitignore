@@ -4,5 +4,6 @@
 **/.cache
 **/bin
 **/.vscode
+**/target
 test.sh
 compile_commands.json

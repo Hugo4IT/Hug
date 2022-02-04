@@ -11,10 +11,12 @@ bool isValidSymbolName(char ch) {
 void parseSymbol(Script *script, char **program) {
     uint32_t startOffset = 0;
     while (!isCharacter(**program)) (*program)++;
-    while (**program) {
+    while (true) {
         char ch = **program;
 
         if (!isValidSymbolName(ch)) {
+            if (startOffset == 0) return;
+
             char symbol[startOffset + 1];
 
             for (uint32_t i = 0; i < startOffset; i++)
@@ -22,6 +24,7 @@ void parseSymbol(Script *script, char **program) {
             symbol[startOffset] = '\0';
 
             printf("Symbol: %s\n", symbol);
+            (*program)--;
             return;
         }
 

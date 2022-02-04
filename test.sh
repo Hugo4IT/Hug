@@ -1,1 +1,0 @@
-watch -n 1 "make debug -B && bin/makr.debug test/prog.makr"
