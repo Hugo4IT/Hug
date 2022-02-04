@@ -1,3 +1,3 @@
-# MAKr
+# hug
 
-My own lil language inspired by Rust and GDScript, implemented in Rust.
+My own lil easy-to-use programming language inspired by GDScript & Rust, focused on being beginner-friendly while providing advanced features and incredible speed.
