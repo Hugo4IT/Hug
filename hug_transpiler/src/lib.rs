@@ -1,5 +1,5 @@
 use hug_lib::Script;
-use hug_lexer::tokenizer::Tokenizer;
+use hug_lexer::lex;
 
 #[derive(Debug, Clone)]
 pub enum Variable {
@@ -24,9 +24,9 @@ pub enum Symbol {
 
 pub fn transpile(program: String) -> Script {
     let mut script = Script::empty();
-    let tokens = Tokenizer::new(&program).tokenize();
+    let token_pairs = lex(&program);
 
-    for token in tokens.iter() {
+    for token in token_pairs.iter() {
         println!("{:?}", token);
     }
 

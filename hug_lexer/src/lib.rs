@@ -1,6 +1,13 @@
+use parser::{TokenPair, generate_pairs};
 use tokenizer::{Tokenizer, TokenKind, Token};
 
 pub mod tokenizer;
+pub mod parser;
+
+pub fn lex(program: &str) -> Vec<TokenPair> {
+    let tokens = tokenize(program);
+    generate_pairs(program, tokens)
+}
 
 pub fn tokenize(program: &str) -> Vec<Token> {
     Tokenizer::new(program).tokenize()
