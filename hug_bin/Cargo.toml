@@ -1,0 +1,12 @@
+[package]
+name = "hug"
+version = "0.1.0"
+edition = "2021"
+authors = ["Hugo van de Kuilen <Hugo4IT>"]
+description = "An easy-to-use programming language inspired by GDScript & Rust, focussed on being beginner-friendly while providing advanced features and incredible speed."
+
+[dependencies]
+hug_compiler = { path = "../hug_compiler" }
+hug_transpiler = { path = "../hug_transpiler" }
+hug_interpreter = { path = "../hug_interpreter" }
+clap = { version = "3.0.13", features = ["cargo", "wrap_help"] }

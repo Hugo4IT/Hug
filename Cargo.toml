@@ -1,9 +1,10 @@
 [workspace]
 members = [
-    "makr_compiler",
-    "makr_transpiler",
-    "makr_interpreter",
-    "makr_std",
-    "makr_lib",
-    "makr_bin"
+    "hug_compiler",
+    "hug_tokenizer",
+    "hug_transpiler",
+    "hug_interpreter",
+    "hug_std",
+    "hug_lib",
+    "hug_bin"
 ]
