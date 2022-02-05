@@ -2,7 +2,7 @@ use crate::tokenizer::Token;
 
 #[derive(Debug, Clone)]
 pub struct TokenPair {
-    pub original: String,
+    pub text: String,
     pub token: Token,
 }
 
@@ -17,7 +17,7 @@ pub fn generate_pairs(program: &str, tokens: Vec<Token>) -> Vec<TokenPair> {
         }
 
         pairs.push(TokenPair {
-            original: buffer,
+            text: buffer,
             token
         })
     }
