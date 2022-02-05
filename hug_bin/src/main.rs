@@ -26,27 +26,36 @@ fn main() {
     
     match app.value_of("command").unwrap() {
         "r" | "run" => {
+            let file_name = app.value_of("input_file").unwrap_or_else(|| todo!());// TODO: Read project.hug
+            let mut file = OpenOptions::new()
+                .read(true)
+                .open(file_name)
+                .expect(format!("Could not open file {}!", file_name).as_str());
+            
+            let mut buffer = String::new();
+            file.read_to_string(&mut buffer).expect("Could not read file!");
 
+            let transpiled = hug_transpiler::transpile(buffer);
         },
         "t" | "transpile" => {
 
         },
         "c" | "compile" => {
-            unimplemented!()
+            let file_name = app.value_of("input_file").unwrap_or_else(|| todo!());// TODO: Read project.hug
+            let mut file = OpenOptions::new()
+                .read(true)
+                .open(file_name)
+                .expect(format!("Could not open file {}!", file_name).as_str());
+            
+            let mut buffer = String::new();
+            file.read_to_string(&mut buffer).expect("Could not read file!");
+
+            hug_compiler::compile(buffer);
         },
         _ => unreachable!()
     }
     
-    let file_name = app.value_of("input_file").unwrap_or_else(|| todo!());// TODO: Read project.hug
-    let mut file = OpenOptions::new()
-        .read(true)
-        .open(file_name)
-        .expect(format!("Could not open file {}!", file_name).as_str());
     
-    let mut buffer = String::new();
-    file.read_to_string(&mut buffer).expect("Could not read file!");
-
-    let transpiled = hug_transpiler::transpile(buffer);
     
 }
 

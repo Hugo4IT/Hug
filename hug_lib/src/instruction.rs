@@ -1,6 +1,8 @@
+use crate::stack::StackAddress;
+
 #[derive(Debug, Clone)]
 pub enum Instruction {
     Noop,
-    WriteStack { buffer: Vec<u8>, at: usize },
-    ReadStack { from: usize, to: usize },
+    WriteStack { data: u32, location: StackAddress },
+    CopyStack { from: StackAddress, to: StackAddress },
 }

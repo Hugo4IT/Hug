@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 hug_transpiler = { path = "../hug_transpiler" }
 hug_lib = { path = "../hug_lib" }
+asmpeach = "0.1.*"

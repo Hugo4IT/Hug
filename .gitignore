@@ -5,6 +5,5 @@
 **/bin
 **/.vscode
 **/target
-/test
 test.sh
 compile_commands.json
