@@ -1,0 +1,42 @@
+//! Automatically imported into every project, contains basic hug features.
+@extern(location = "target/debug/libhug_core.so") module core;
+
+@extern function helloWorld;
+
+/// 8-bit Integer
+@extern type Int8;
+
+/// 16-bit Integer
+@extern type Int16;
+
+/// 32-bit Integer
+@extern type Int32;
+
+/// 64-bit Integer
+@extern type Int64;
+
+/// 128-bit Integer
+@extern type Int128;
+
+
+/// 8-bit Unsigned (positive) Integer
+@extern type UInt8;
+
+/// 16-bit Unsigned (positive) Integer
+@extern type UInt16;
+
+/// 32-bit Unsigned (positive) Integer
+@extern type UInt32;
+
+/// 64-bit Unsigned (positive) Integer
+@extern type UInt64;
+
+/// 128-bit Unsigned (positive) Integer
+@extern type UInt128;
+
+
+/// 32-bit Float
+@extern type Float32;
+
+/// 64-bit Float
+@extern type Float64;

@@ -7,3 +7,7 @@ edition = "2021"
 
 [dependencies]
 hug_lib = { path = "../hug_lib" }
+hug_ast = { path = "../hug_ast" }
+hug_core = { path = "../hug_core" }
+hug_lexer = { path = "../hug_lexer" }
+libloading = "0.7"

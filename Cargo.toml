@@ -2,9 +2,9 @@
 members = [
     "hug_lexer",
     "hug_compiler",
-    "hug_transpiler",
     "hug_interpreter",
-    "hug_std",
+    "hug_core",
+    "hug_ast",
     "hug_lib",
     "hug_bin"
 ]

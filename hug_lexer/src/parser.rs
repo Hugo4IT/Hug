@@ -18,7 +18,7 @@ pub fn generate_pairs(program: &str, tokens: Vec<Token>) -> Vec<TokenPair> {
 
         pairs.push(TokenPair {
             text: buffer,
-            token
+            token,
         })
     }
 

@@ -1,4 +1,7 @@
-use hug_lexer::{run_test, tokenizer::{TokenKind, KeywordKind, LiteralKind, Base}};
+use hug_lexer::{
+    run_test,
+    tokenizer::{Base, Ident, KeywordKind, LiteralKind, TokenKind},
+};
 
 const COMMENTS_PROGRAM: &str = r###"
 // Hello
@@ -30,105 +33,92 @@ fn comments() {
 }
 
 const VARIABLES_PROGRAM: &str = r###"
-var some_Weird_hellishName: MyType[] = [MyType(50), MyType(13)];
-var is_snake_case_epic = true;
-var andCamelCaseTooRight = true;
-var this_is_a_string = "wowie";
-var this_is_a_formatted_string = f"This is wowie: {wowie}";
-var this_is_an_escaped_string = "Hehehe, \"";
+let some_Weird_hellishName: MyType[] = [MyType(50), MyType(13)];
+let is_snake_case_epic = true;
+let andCamelCaseTooRight = true;
+let this_is_a_string = "wowie";
+let this_is_a_formatted_string = f"This is wowie: {wowie}";
+let this_is_an_escaped_string = "Hehehe, \"";
 "###;
 
 const VARIABLES_EXPECTED_RESULT: &[(TokenKind, usize)] = &[
     (TokenKind::Whitespace, 1), // \n
-
     // var some_Weird_hellishName: MyType[] = [MyType(50), MyType(13)];
-
-    (TokenKind::Keyword(KeywordKind::Var), 3),
+    (TokenKind::Keyword(KeywordKind::Let), 3),
     (TokenKind::Whitespace, 1),
-    (TokenKind::Identifier, 22),
+    (TokenKind::Identifier(Ident(0)), 22),
     (TokenKind::Colon, 1),
     (TokenKind::Whitespace, 1),
-    (TokenKind::Identifier, 6),
+    (TokenKind::Identifier(Ident(1)), 6),
     (TokenKind::OpenBracket, 1),
     (TokenKind::CloseBracket, 1),
     (TokenKind::Whitespace, 1),
     (TokenKind::Assign, 1),
     (TokenKind::Whitespace, 1),
     (TokenKind::OpenBracket, 1),
-    (TokenKind::Identifier, 6),
+    (TokenKind::Identifier(Ident(1)), 6),
     (TokenKind::OpenParenthesis, 1),
     (TokenKind::Literal(LiteralKind::Integer(Base::Decimal)), 2),
     (TokenKind::CloseParenthesis, 1),
     (TokenKind::Comma, 1),
     (TokenKind::Whitespace, 1),
-    (TokenKind::Identifier, 6),
+    (TokenKind::Identifier(Ident(1)), 6),
     (TokenKind::OpenParenthesis, 1),
     (TokenKind::Literal(LiteralKind::Integer(Base::Decimal)), 2),
     (TokenKind::CloseParenthesis, 1),
     (TokenKind::CloseBracket, 1),
     (TokenKind::SemiColon, 1),
     (TokenKind::Whitespace, 1),
-
     // var is_snake_case_epic = true;
-
-    (TokenKind::Keyword(KeywordKind::Var), 3),
+    (TokenKind::Keyword(KeywordKind::Let), 3),
     (TokenKind::Whitespace, 1),
-    (TokenKind::Identifier, 18),
+    (TokenKind::Identifier(Ident(2)), 18),
     (TokenKind::Whitespace, 1),
     (TokenKind::Assign, 1),
     (TokenKind::Whitespace, 1),
     (TokenKind::Literal(LiteralKind::Boolean), 4),
     (TokenKind::SemiColon, 1),
     (TokenKind::Whitespace, 1),
-
     // var andCamelCaseTooRight = true;
-
-    (TokenKind::Keyword(KeywordKind::Var), 3),
+    (TokenKind::Keyword(KeywordKind::Let), 3),
     (TokenKind::Whitespace, 1),
-    (TokenKind::Identifier, 20),
+    (TokenKind::Identifier(Ident(3)), 20),
     (TokenKind::Whitespace, 1),
     (TokenKind::Assign, 1),
     (TokenKind::Whitespace, 1),
     (TokenKind::Literal(LiteralKind::Boolean), 4),
     (TokenKind::SemiColon, 1),
     (TokenKind::Whitespace, 1),
-
     // var this_is_a_string = "wowie";
-
-    (TokenKind::Keyword(KeywordKind::Var), 3),
+    (TokenKind::Keyword(KeywordKind::Let), 3),
     (TokenKind::Whitespace, 1),
-    (TokenKind::Identifier, 16),
+    (TokenKind::Identifier(Ident(4)), 16),
     (TokenKind::Whitespace, 1),
     (TokenKind::Assign, 1),
     (TokenKind::Whitespace, 1),
     (TokenKind::Literal(LiteralKind::String), 7),
     (TokenKind::SemiColon, 1),
     (TokenKind::Whitespace, 1),
-
     // var this_is_a_formatted_string = f"This is wowie: {wowie}";
-
-    (TokenKind::Keyword(KeywordKind::Var), 3),
+    (TokenKind::Keyword(KeywordKind::Let), 3),
     (TokenKind::Whitespace, 1),
-    (TokenKind::Identifier, 26),
+    (TokenKind::Identifier(Ident(5)), 26),
     (TokenKind::Whitespace, 1),
     (TokenKind::Assign, 1),
     (TokenKind::Whitespace, 1),
     (TokenKind::Literal(LiteralKind::FormatString), 25),
     (TokenKind::SemiColon, 1),
     (TokenKind::Whitespace, 1),
-
     // var this_is_an_escaped_string = "Hehehe, \"";
-
-    (TokenKind::Keyword(KeywordKind::Var), 3),
+    (TokenKind::Keyword(KeywordKind::Let), 3),
     (TokenKind::Whitespace, 1),
-    (TokenKind::Identifier, 25),
+    (TokenKind::Identifier(Ident(6)), 25),
     (TokenKind::Whitespace, 1),
     (TokenKind::Assign, 1),
     (TokenKind::Whitespace, 1),
     (TokenKind::Literal(LiteralKind::String), 12),
     (TokenKind::SemiColon, 1),
     (TokenKind::Whitespace, 1),
-
     (TokenKind::Whitespace, 1), // \n
 ];
 

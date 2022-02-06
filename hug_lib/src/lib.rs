@@ -1,19 +1,32 @@
-use instruction::Instruction;
+#[macro_export]
+macro_rules! hug_module {
+    ($init:path, $deinit:path) => {
+        use hug_lib::HugModule;
 
-pub mod instruction;
-pub mod stack;
+        #[no_mangle]
+        unsafe extern "C" fn __HUG_MODULE_INIT(module: &mut HugModule) {
+            $init(module);
+        }
 
-#[derive(Debug, Clone)]
-pub struct Script {
-    pub instructions: Vec<Instruction>,
-    pub stack_size: usize,
+        #[no_mangle]
+        unsafe extern "C" fn __HUG_MODULE_DEINIT(module: &mut HugModule) {
+            $deinit(module);
+        }
+    };
 }
 
-impl Script {
-    pub fn empty() -> Self {
-        Self {
-            instructions: Vec::new(),
-            stack_size: 0,
+pub struct HugFunction {
+
+}
+
+pub struct HugModule {
+    functions: Vec<HugFunction>,
+}
+
+impl HugModule {
+    pub fn new() -> HugModule {
+        HugModule {
+            functions: Vec::new(),
         }
     }
 }

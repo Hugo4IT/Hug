@@ -1,4 +1,4 @@
-use std::str::Chars;
+use std::{collections::HashMap, str::Chars};
 
 type TokenList = Vec<Token>;
 
@@ -11,73 +11,88 @@ pub struct Token {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum TokenKind {
     // Comments
-    LineComment,            //  //
-    BlockComment,           //  /*
+    LineComment,  //  //
+    BlockComment, //  /*
 
-    Whitespace,             //  \s,\n,\n\r, etc.
+    Whitespace, //  \s,\n,\n\r, etc.
 
-    Literal(LiteralKind),   //  420, "nice", 6.9, 'F'
-    Keyword(KeywordKind),   //  var, TODO: Add more keywords
-    Identifier,             //  var [this] = 10
+    Literal(LiteralKind),       //  420, "nice", 6.9, 'F'
+    Keyword(KeywordKind),       //  var, TODO: Add more keywords
+    Identifier(Ident),          //  var [this] = 10
+    Annotation(AnnotationKind), //  @
 
     // Not specific to any usage
-    SemiColon,              //  ;
-    Comma,                  //  ,
-    Dot,                    //  .
-    OpenParenthesis,        //  (
-    CloseParenthesis,       //  )
-    OpenBrace,              //  {
-    CloseBrace,             //  }
-    OpenBracket,            //  [
-    CloseBracket,           //  ]
-    Colon,                  //  :
-
-    Annotation,             //  @
+    SemiColon,        //  ;
+    Comma,            //  ,
+    Dot,              //  .
+    OpenParenthesis,  //  (
+    CloseParenthesis, //  )
+    OpenBrace,        //  {
+    CloseBrace,       //  }
+    OpenBracket,      //  [
+    CloseBracket,     //  ]
+    Colon,            //  :
 
     // Operators
-    Assign,                 //  =
-    Add,                    //  +
-    Subtract,               //  -
-    Multiply,               //  *
-    Divide,                 //  /
-    Modulus,                //  %
-    AddAssign,              //  +=
-    SubtractAssign,         //  -=
-    MultiplyAssign,         //  *=
-    DivideAssign,           //  /=
-    ModulusAssign,          //  %=
+    Assign,         //  =
+    Add,            //  +
+    Subtract,       //  -
+    Multiply,       //  *
+    Divide,         //  /
+    Modulus,        //  %
+    AddAssign,      //  +=
+    SubtractAssign, //  -=
+    MultiplyAssign, //  *=
+    DivideAssign,   //  /=
+    ModulusAssign,  //  %=
 
     // Conditionals
-    Not,                    //  !
-    And,                    //  &&
-    Or,                     //  ||
-    IsEqualTo,              //  ==
-    IsNotEqualTo,           //  !=
-    LessThan,               //  <
-    GreaterThan,            //  >
-    LessThanOrEquals,       //  <=
-    GreaterThanOrEquals,    //  >=
+    Not,                 //  !
+    And,                 //  &&
+    Or,                  //  ||
+    IsEqualTo,           //  ==
+    IsNotEqualTo,        //  !=
+    LessThan,            //  <
+    GreaterThan,         //  >
+    LessThanOrEquals,    //  <=
+    GreaterThanOrEquals, //  >=
 
     // Binary operators
-    BinaryAnd,              //  &
-    BinaryOr,               //  |
-    BinaryNot,              //  ~
-    BinaryXOr,              //  ^
-    BinaryAndAssign,        //  &=
-    BinaryOrAssign,         //  |=
-    BinaryNotAssign,        //  ~=
-    BinaryXOrAssign,        //  ^=
-    ShiftLeft,              //  <<
-    ShiftRight,             //  >>
-    ShiftLeftOverflow,      //  <<<
-    ShiftRightOverflow,     //  >>>
+    BinaryAnd,          //  &
+    BinaryOr,           //  |
+    BinaryNot,          //  ~
+    BinaryXOr,          //  ^
+    BinaryAndAssign,    //  &=
+    BinaryOrAssign,     //  |=
+    BinaryNotAssign,    //  ~=
+    BinaryXOrAssign,    //  ^=
+    ShiftLeft,          //  <<
+    ShiftRight,         //  >>
+    ShiftLeftOverflow,  //  <<<
+    ShiftRightOverflow, //  >>>
 
-    Unknown,                // Error
+    Unknown, // Error
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct Ident(pub usize);
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum AnnotationKind {
+    Extern,
+    Other(Ident),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum KeywordKind {
-    Var,
+    Enum,
+    Function,
+    Let,
+    Module,
+    Private,
+    Public,
+    Type,
+    Use,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -88,7 +103,7 @@ pub enum LiteralKind {
     String,
     RawString,
     FormatString,
-    Boolean
+    Boolean,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -99,9 +114,44 @@ pub enum Base {
     Decimal,
 }
 
+impl TokenKind {
+    pub fn expect_literal(self) -> Option<LiteralKind> {
+        if let Self::Literal(k) = self {
+            Some(k)
+        } else {
+            None
+        }
+    }
+
+    pub fn expect_keyword(self) -> Option<KeywordKind> {
+        if let Self::Keyword(k) = self {
+            Some(k)
+        } else {
+            None
+        }
+    }
+
+    pub fn expect_ident(self) -> Option<Ident> {
+        if let Self::Identifier(id) = self {
+            Some(id)
+        } else {
+            None
+        }
+    }
+
+    pub fn expect_kind(self, kind: TokenKind) -> Option<Self> {
+        if self == kind {
+            Some(self)
+        } else {
+            None
+        }
+    }
+}
+
 pub struct Tokenizer<'a> {
     pub len: usize,
-    pub chars: Chars<'a>
+    pub chars: Chars<'a>,
+    pub idents: HashMap<String, Ident>,
 }
 
 impl<'a> Tokenizer<'a> {
@@ -109,6 +159,15 @@ impl<'a> Tokenizer<'a> {
         Self {
             len: program.len(),
             chars: program.chars(),
+            idents: HashMap::new(),
+        }
+    }
+
+    pub fn with_idents(idents: HashMap<String, Ident>, program: &'a str) -> Self {
+        Self {
+            len: program.len(),
+            chars: program.chars(),
+            idents
         }
     }
 
@@ -137,7 +196,7 @@ impl<'a> Tokenizer<'a> {
     pub fn is_eof(&self) -> bool {
         self.chars.as_str().is_empty()
     }
-    
+
     pub fn ignore_until(&mut self, condition: impl Fn(char) -> bool) {
         while !condition(self.peek_next()) && !self.is_eof() {
             self.next().unwrap();
@@ -247,8 +306,39 @@ impl<'a> Tokenizer<'a> {
     }
 
     pub fn annotation(&mut self) -> TokenKind {
-        self.ignore_until(|c| c.is_whitespace());
-        TokenKind::Annotation
+        let mut buffer = String::new();
+        while self.peek_next().is_alphanumeric() && !self.is_eof() {
+            let c = self.next().unwrap();
+            buffer.push(c);
+        }
+
+        let kind = match buffer.as_ref() {
+            "extern" => AnnotationKind::Extern,
+            other => {
+                if other.len() == 0 {
+                    return TokenKind::Unknown;
+                }
+
+                for (i, ch) in other.chars().enumerate() {
+                    // If not a valid identifier name
+                    if !((ch.is_alphabetic() && i == 0) || (ch.is_alphanumeric() && i != 0))
+                        && ch != '_'
+                    {
+                        return TokenKind::Unknown;
+                    }
+                }
+
+                if let Some(id) = self.idents.get(other) {
+                    AnnotationKind::Other(*id)
+                } else {
+                    let id = self.idents.values().len();
+                    self.idents.insert(other.to_string(), Ident(id));
+                    AnnotationKind::Other(Ident(id))
+                }
+            }
+        };
+
+        TokenKind::Annotation(kind)
     }
 
     pub fn condition(&mut self, kind: TokenKind) -> TokenKind {
@@ -259,16 +349,16 @@ impl<'a> Tokenizer<'a> {
                 if next_char == '&' {
                     TokenKind::And
                 } else {
-                    return self.operator(kind)
+                    return self.operator(kind);
                 }
-            },
+            }
             TokenKind::BinaryOr => {
                 if next_char == '|' {
                     TokenKind::Or
                 } else {
-                    return self.operator(kind)
+                    return self.operator(kind);
                 }
-            },
+            }
             TokenKind::Assign if next_char == '=' => TokenKind::IsEqualTo,
             TokenKind::LessThan if next_char == '=' => TokenKind::LessThanOrEquals,
             TokenKind::LessThan if next_char == '<' => {
@@ -302,23 +392,46 @@ impl<'a> Tokenizer<'a> {
         let mut buffer = String::new();
         buffer.push(first_char);
 
-        while {let c = self.peek_next(); c.is_alphanumeric() || c == '_'} && !self.is_eof() {    
+        while {
+            let c = self.peek_next();
+            c.is_alphanumeric() || c == '_'
+        } && !self.is_eof()
+        {
             buffer.push(self.next().unwrap());
         }
 
         match buffer.as_str() {
-            "var" => TokenKind::Keyword(KeywordKind::Var),
+            "enum" => TokenKind::Keyword(KeywordKind::Enum),
+            "function" => TokenKind::Keyword(KeywordKind::Function),
+            "let" => TokenKind::Keyword(KeywordKind::Let),
+            "module" => TokenKind::Keyword(KeywordKind::Module),
+            "private" => TokenKind::Keyword(KeywordKind::Private),
+            "public" => TokenKind::Keyword(KeywordKind::Public),
+            "type" => TokenKind::Keyword(KeywordKind::Type),
+            "use" => TokenKind::Keyword(KeywordKind::Use),
             "true" => TokenKind::Literal(LiteralKind::Boolean),
             "false" => TokenKind::Literal(LiteralKind::Boolean),
             other => {
-                for (i, char) in other.chars().enumerate() {
+                if other.len() == 0 {
+                    return TokenKind::Unknown;
+                }
+
+                for (i, ch) in other.chars().enumerate() {
                     // If not a valid identifier name
-                    if !((char.is_alphabetic() && i == 0) || (char.is_alphanumeric() && i != 0)) && char != '_' {
-                        return TokenKind::Unknown
+                    if !((ch.is_alphabetic() && i == 0) || (ch.is_alphanumeric() && i != 0))
+                        && ch != '_'
+                    {
+                        return TokenKind::Unknown;
                     }
                 }
 
-                TokenKind::Identifier
+                if let Some(id) = self.idents.get(other) {
+                    return TokenKind::Identifier(*id);
+                }
+
+                let id = self.idents.values().len();
+                self.idents.insert(other.to_string(), Ident(id));
+                TokenKind::Identifier(Ident(id))
             }
         }
     }
@@ -361,7 +474,7 @@ impl<'a> Tokenizer<'a> {
             '[' => TokenKind::OpenBracket,
             ']' => TokenKind::CloseBracket,
             ':' => TokenKind::Colon,
-            
+
             // Common operators
             // +, +=
             '+' => self.operator(TokenKind::Add),
@@ -370,7 +483,7 @@ impl<'a> Tokenizer<'a> {
             // *, *=
             '*' => self.operator(TokenKind::Multiply),
             // Divide already parsed at the top
-            
+
             // Uncommon operators
             // %, %=
             '%' => self.operator(TokenKind::Modulus),
@@ -378,7 +491,7 @@ impl<'a> Tokenizer<'a> {
             '~' => self.operator(TokenKind::BinaryNot),
             // ^, ^=
             '^' => self.operator(TokenKind::BinaryXOr),
-            
+
             // Conditions or operators
             // =, ==
             '=' => self.condition(TokenKind::Assign),
@@ -393,19 +506,21 @@ impl<'a> Tokenizer<'a> {
             // >, >>, >>>, >=
             '>' => self.condition(TokenKind::GreaterThan),
 
-            emoji if !emoji.is_ascii() && unic_emoji_char::is_emoji(emoji) => panic!("Dont use emojis in your script!"),
+            emoji if !emoji.is_ascii() && unic_emoji_char::is_emoji(emoji) => {
+                panic!("Dont use emojis in your script!")
+            }
 
             // Try keywords otherwise return TokenKind::Unknown
-            other => self.try_keyword(other)
+            other => self.try_keyword(other),
         };
 
         Token {
             len: self.consumed_len(),
-            kind: token_kind
+            kind: token_kind,
         }
     }
 
-    pub fn tokenize(mut self) -> TokenList {
+    pub fn tokenize(&mut self) -> TokenList {
         let mut tokens = TokenList::new();
         while !self.is_eof() {
             self.reset_consumed_len();
