@@ -20,3 +20,63 @@ Currently working features are:
   - `Char` - A single character (8 bits)
   - `Function` - Pointer to Hug function
   - `ExternalFunction` - Pointer to external (dynamically loaded) function
+
+## Usage
+
+> **NOTE:** The `other/` directory contains a file for syntax highlighting in sublime text (not fully finished yet)
+
+> **IMPORTANT:** Currently, the Core library is compiled to a dynamic library, the extension differs per platform. Make sure to change this line in `hug_core/hug/core.hug`:
+> 
+> ```hug
+> @extern(location = "target/debug/libhug_core.dylib") module core
+> ```
+> 
+> To any of these depending on your platform:
+> 
+> **Windows:**
+> 
+> ```hug
+> @extern(location = "target/debug/libhug_core.dll") module core
+> ```
+> 
+> **MacOS:**
+> 
+> ```hug
+> @extern(location = "target/debug/libhug_core.dylib") module core
+> ```
+> 
+> **Linux:**
+> 
+> ```hug
+> @extern(location = "target/debug/libhug_core.so") module core
+> ```
+
+No precompiled binaries are available yet, but you can run it yourself using:
+
+```bash
+cargo run -- <args for hug>
+```
+
+For a list of commands run:
+
+```bash
+cargo run -- --help
+```
+
+Running a .hug file:
+
+```bash
+cargo run -- run <file>
+```
+
+Running the unit test:
+
+```bash
+cargo test
+```
+
+And lastly, disabling debug output:
+
+```bash
+cargo run --release -- <args for hug>
+```
