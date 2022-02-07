@@ -1,1 +1,4 @@
-var test_variable = 10;
+let test_variable = 10
+
+add(test_variable, 5)
+

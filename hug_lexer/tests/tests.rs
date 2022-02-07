@@ -1,7 +1,8 @@
 use hug_lexer::{
     run_test,
-    tokenizer::{Base, Ident, KeywordKind, LiteralKind, TokenKind},
+    tokenizer::{Base, KeywordKind, LiteralKind, TokenKind},
 };
+use hug_lib::Ident;
 
 const COMMENTS_PROGRAM: &str = r###"
 // Hello

@@ -26,10 +26,10 @@ contexts:
     - match: '@{{ident}}'
       scope: variable.annotation.hug
 
-    - match: '\b(enum|function|private|public|import)\b'
+    - match: '\b(enum|private|public|import)\b'
       scope: keyword.control.hug
 
-    - match: '\b(let|type|module)\b'
+    - match: '\b(let|type|module|function)\b'
       scope: keyword.variable.hug
       push:
         - meta_scope: entity.name.variable.hug
@@ -43,8 +43,7 @@ contexts:
         - match: '='
           scope: punctuation.definition.numeric.hug
           pop: true
-        - match: ';'
-          scope: punctuation.section.line.end.hug
+        - match: '\w+\b'
           pop: true
         - match: '{'
           scope: punctuation.section.block.start.hug

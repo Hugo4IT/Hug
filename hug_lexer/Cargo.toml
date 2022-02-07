@@ -7,4 +7,4 @@ edition = "2021"
 
 [dependencies]
 unic-emoji-char = "0.9.*"
-hug_core = { path = "../hug_core" }
+hug_lib = { path = "../hug_lib" }

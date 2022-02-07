@@ -1,8 +1,7 @@
 use std::{fs::OpenOptions, io::Read};
 
 use clap::{crate_authors, crate_description, crate_name, crate_version, PossibleValue};
-use hug_interpreter::{interpret, vm::HugVM};
-use hug_lexer::CustomDisplay;
+use hug_interpreter::vm::HugVM;
 
 fn app() -> clap::App<'static> {
     clap::App::new(crate_name!())

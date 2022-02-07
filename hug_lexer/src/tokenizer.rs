@@ -1,5 +1,7 @@
 use std::{collections::HashMap, str::Chars};
 
+use hug_lib::Ident;
+
 type TokenList = Vec<Token>;
 
 #[derive(Debug, Clone, Copy)]
@@ -12,17 +14,16 @@ pub struct Token {
 pub enum TokenKind {
     // Comments
     LineComment,  //  //
-    BlockComment, //  /*
+    BlockComment, //  /* .. */
 
     Whitespace, //  \s,\n,\n\r, etc.
 
     Literal(LiteralKind),       //  420, "nice", 6.9, 'F'
-    Keyword(KeywordKind),       //  var, TODO: Add more keywords
+    Keyword(KeywordKind),       //  var, function, type, module
     Identifier(Ident),          //  var [this] = 10
     Annotation(AnnotationKind), //  @
 
     // Not specific to any usage
-    SemiColon,        //  ;
     Comma,            //  ,
     Dot,              //  .
     OpenParenthesis,  //  (
@@ -73,9 +74,6 @@ pub enum TokenKind {
 
     Unknown, // Error
 }
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct Ident(pub usize);
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum AnnotationKind {
@@ -167,7 +165,7 @@ impl<'a> Tokenizer<'a> {
         Self {
             len: program.len(),
             chars: program.chars(),
-            idents
+            idents,
         }
     }
 
@@ -464,7 +462,6 @@ impl<'a> Tokenizer<'a> {
             '@' => self.annotation(),
 
             // Others
-            ';' => TokenKind::SemiColon,
             ',' => TokenKind::Comma,
             '.' => TokenKind::Dot,
             '(' => TokenKind::OpenParenthesis,

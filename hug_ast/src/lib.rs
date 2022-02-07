@@ -1,23 +1,43 @@
 use std::fmt::Display;
 
-use hug_lexer::{parser::TokenPair, tokenizer::Ident};
+use hug_lexer::parser::TokenPair;
+use hug_lib::{value::HugValue, Ident};
 use parser::HugTreeParser;
 
 pub mod parser;
 
 #[derive(Debug, Clone)]
+pub enum HugTreeFunctionCallArg {
+    Variable(Ident),
+    Value(HugValue),
+}
+
+#[derive(Debug, Clone)]
 pub enum HugTreeEntry {
-    Noop,
     ModuleDefinition {
         module: Ident,
+    },
+    ExternalTypeDefinition {
+        _type: Ident,
     },
     ExternalModuleDefinition {
         module: Ident,
         location: String,
     },
-    VariableDefinition { variable: Ident },
+    ExternalFunctionDefinition {
+        function: Ident,
+    },
+    VariableDefinition {
+        variable: Ident,
+        value: HugValue,
+    },
+    FunctionCall {
+        function: Ident,
+        args: Vec<HugTreeFunctionCallArg>,
+    },
 }
 
+#[derive(Debug)]
 pub struct HugTree {
     pub entries: Vec<HugTreeEntry>,
 }
@@ -25,7 +45,7 @@ pub struct HugTree {
 impl HugTree {
     pub fn new() -> HugTree {
         HugTree {
-            entries: Vec::new()
+            entries: Vec::new(),
         }
     }
 
@@ -41,8 +61,8 @@ impl HugTree {
 impl Display for HugTree {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut buffer = String::new();
-        for entry in self.entries.iter() {
-            buffer.push_str(&format!("    {:?},\n", entry));
+        for (i, entry) in self.entries.iter().enumerate() {
+            buffer.push_str(&format!("{:4}: {:?},\n", i, entry));
         }
         write!(f, "[\n{}]", buffer)
     }
