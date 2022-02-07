@@ -34,12 +34,12 @@ fn comments() {
 }
 
 const VARIABLES_PROGRAM: &str = r###"
-let some_Weird_hellishName: MyType[] = [MyType(50), MyType(13)];
-let is_snake_case_epic = true;
-let andCamelCaseTooRight = true;
-let this_is_a_string = "wowie";
-let this_is_a_formatted_string = f"This is wowie: {wowie}";
-let this_is_an_escaped_string = "Hehehe, \"";
+let some_Weird_hellishName: MyType[] = [MyType(50), MyType(13)]
+let is_snake_case_epic = true
+let andCamelCaseTooRight = true
+let this_is_a_string = "wowie"
+let this_is_a_formatted_string = f"This is wowie: {wowie}"
+let this_is_an_escaped_string = "Hehehe, \""
 "###;
 
 const VARIABLES_EXPECTED_RESULT: &[(TokenKind, usize)] = &[
@@ -68,7 +68,6 @@ const VARIABLES_EXPECTED_RESULT: &[(TokenKind, usize)] = &[
     (TokenKind::Literal(LiteralKind::Integer(Base::Decimal)), 2),
     (TokenKind::CloseParenthesis, 1),
     (TokenKind::CloseBracket, 1),
-    (TokenKind::SemiColon, 1),
     (TokenKind::Whitespace, 1),
     // var is_snake_case_epic = true;
     (TokenKind::Keyword(KeywordKind::Let), 3),
@@ -78,7 +77,6 @@ const VARIABLES_EXPECTED_RESULT: &[(TokenKind, usize)] = &[
     (TokenKind::Assign, 1),
     (TokenKind::Whitespace, 1),
     (TokenKind::Literal(LiteralKind::Boolean), 4),
-    (TokenKind::SemiColon, 1),
     (TokenKind::Whitespace, 1),
     // var andCamelCaseTooRight = true;
     (TokenKind::Keyword(KeywordKind::Let), 3),
@@ -88,7 +86,6 @@ const VARIABLES_EXPECTED_RESULT: &[(TokenKind, usize)] = &[
     (TokenKind::Assign, 1),
     (TokenKind::Whitespace, 1),
     (TokenKind::Literal(LiteralKind::Boolean), 4),
-    (TokenKind::SemiColon, 1),
     (TokenKind::Whitespace, 1),
     // var this_is_a_string = "wowie";
     (TokenKind::Keyword(KeywordKind::Let), 3),
@@ -98,7 +95,6 @@ const VARIABLES_EXPECTED_RESULT: &[(TokenKind, usize)] = &[
     (TokenKind::Assign, 1),
     (TokenKind::Whitespace, 1),
     (TokenKind::Literal(LiteralKind::String), 7),
-    (TokenKind::SemiColon, 1),
     (TokenKind::Whitespace, 1),
     // var this_is_a_formatted_string = f"This is wowie: {wowie}";
     (TokenKind::Keyword(KeywordKind::Let), 3),
@@ -108,7 +104,6 @@ const VARIABLES_EXPECTED_RESULT: &[(TokenKind, usize)] = &[
     (TokenKind::Assign, 1),
     (TokenKind::Whitespace, 1),
     (TokenKind::Literal(LiteralKind::FormatString), 25),
-    (TokenKind::SemiColon, 1),
     (TokenKind::Whitespace, 1),
     // var this_is_an_escaped_string = "Hehehe, \"";
     (TokenKind::Keyword(KeywordKind::Let), 3),
@@ -118,7 +113,6 @@ const VARIABLES_EXPECTED_RESULT: &[(TokenKind, usize)] = &[
     (TokenKind::Assign, 1),
     (TokenKind::Whitespace, 1),
     (TokenKind::Literal(LiteralKind::String), 12),
-    (TokenKind::SemiColon, 1),
     (TokenKind::Whitespace, 1),
     (TokenKind::Whitespace, 1), // \n
 ];
