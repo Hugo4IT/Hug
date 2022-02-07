@@ -1,4 +1,3 @@
-pub use paste::paste;
 use std::collections::HashMap;
 use value::HugValue;
 
