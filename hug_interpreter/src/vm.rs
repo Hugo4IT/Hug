@@ -4,7 +4,7 @@ use hug_ast::HugTree;
 use hug_core::HUG_CORE_SCRIPT;
 use hug_lexer::{parser::generate_pairs, tokenizer::Tokenizer};
 use hug_lib::{
-    value::{HugExternalFunction, HugValue},
+    value::HugValue,
     HugModule, Ident,
 };
 

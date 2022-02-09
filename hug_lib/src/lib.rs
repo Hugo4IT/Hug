@@ -5,17 +5,12 @@ pub mod value;
 
 #[macro_export]
 macro_rules! hug_module {
-    ($init:path, $deinit:path) => {
+    ($init:path) => {
         use hug_lib::HugModule;
 
         #[no_mangle]
         extern "C" fn __HUG_MODULE_INIT(module: &mut HugModule) {
             $init(module);
-        }
-
-        #[no_mangle]
-        extern "C" fn __HUG_MODULE_DEINIT(module: &mut HugModule) {
-            $deinit(module);
         }
     };
 }

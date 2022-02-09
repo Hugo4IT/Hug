@@ -1,4 +1,61 @@
-let test_variable = 10
+let num: Float32 = 7
+let wow, hi = (30, 20)
 
-add(test_variable, 5)
+print("This is a number: ", num)
 
+
+
+
+
+	import std.io;
+
+	fn main() {
+		print("Hello, World!")
+	}
+
+
+
+
+
+
+
+	
+
+
+
+
+
+
+
+// Python
+
+function printNum(num: Float32):
+	print("Wowie: ", num)
+
+	print("hoi")
+
+// Lua
+
+function printNum(num: Float32)
+	print("Wowie: ", num)
+end
+
+// JavaScript
+
+function printNum(num: Float32) {
+	print("Wowie: ", num)
+
+	print("hoi")
+}
+
+// MicroScript
+
+let printNum = function(num: Float32)
+	print("Wowie: ", num)
+end
+
+// JavaScript again
+
+let printNum = (num: Float32) => {
+	print("Wowie: ", num)
+}

@@ -2,12 +2,36 @@ use std::{collections::HashMap, vec::IntoIter};
 
 use hug_lexer::{
     parser::TokenPair,
-    tokenizer::{AnnotationKind, KeywordKind, LiteralKind, TokenKind},
+    tokenizer::{AnnotationKind, KeywordKind, LiteralKind, TokenKind, TypeKind},
     FilterUseless,
 };
 use hug_lib::{value::HugValue, Ident};
 
 use crate::{HugTree, HugTreeEntry, HugTreeFunctionCallArg};
+
+pub trait TypedDefinition {
+    fn parse_from_type(_type: TypeKind, value: String) -> Self;
+}
+impl TypedDefinition for HugValue {
+    fn parse_from_type(_type: TypeKind, value: String) -> Self {
+        match _type {
+            TypeKind::Int8 => HugValue::from(value.parse::<i8>().expect(&format!("Cannot parse Int8 from {}", value))),
+            TypeKind::Int16 => HugValue::from(value.parse::<i16>().expect(&format!("Cannot parse Int16 from {}", value))),
+            TypeKind::Int32 => HugValue::from(value.parse::<i32>().expect(&format!("Cannot parse Int32 from {}", value))),
+            TypeKind::Int64 => HugValue::from(value.parse::<i64>().expect(&format!("Cannot parse Int64 from {}", value))),
+            TypeKind::Int128 => HugValue::from(value.parse::<i128>().expect(&format!("Cannot parse Int128 from {}", value))),
+            TypeKind::UInt8 => HugValue::from(value.parse::<u8>().expect(&format!("Cannot parse UInt8 from {}", value))),
+            TypeKind::UInt16 => HugValue::from(value.parse::<u16>().expect(&format!("Cannot parse UInt16 from {}", value))),
+            TypeKind::UInt32 => HugValue::from(value.parse::<u32>().expect(&format!("Cannot parse UInt32 from {}", value))),
+            TypeKind::UInt64 => HugValue::from(value.parse::<u64>().expect(&format!("Cannot parse UInt64 from {}", value))),
+            TypeKind::UInt128 => HugValue::from(value.parse::<u128>().expect(&format!("Cannot parse UInt128 from {}", value))),
+            TypeKind::Float32 => HugValue::from(value.parse::<f32>().expect(&format!("Cannot parse Float32 from {}", value))),
+            TypeKind::Float64 => HugValue::from(value.parse::<f64>().expect(&format!("Cannot parse Float64 from {}", value))),
+            TypeKind::String => HugValue::from(value[1..(value.len()-1)].to_string()),
+            TypeKind::Other(_) => todo!(),
+        }
+    }
+}
 
 #[derive(Debug)]
 pub struct HugTreeAnnotationState {
@@ -216,7 +240,17 @@ impl HugTreeParser {
                     value,
                 }
             }
-            TokenKind::Colon => todo!(),
+            TokenKind::Colon => {
+                let _type = self.next().unwrap();
+                let _type = _type.token.kind.expect_type().unwrap();
+                self.next().unwrap().token.kind.expect_kind(TokenKind::Assign).unwrap();
+                let value = self.next().unwrap().text;
+                let value = HugValue::parse_from_type(_type, value);
+                HugTreeEntry::VariableDefinition {
+                    variable: name,
+                    value
+                }
+            },
             _ => panic!("Unexpected token at variable definition: {:?}", next),
         }
     }

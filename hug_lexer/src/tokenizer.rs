@@ -22,6 +22,7 @@ pub enum TokenKind {
     Keyword(KeywordKind),       //  var, function, type, module
     Identifier(Ident),          //  var [this] = 10
     Annotation(AnnotationKind), //  @
+    BuiltInType(TypeKind),      //  Int32, Float64, String
 
     // Not specific to any usage
     Comma,            //  ,
@@ -73,6 +74,24 @@ pub enum TokenKind {
     ShiftRightOverflow, //  >>>
 
     Unknown, // Error
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum TypeKind {
+    Int8,
+    Int16,
+    Int32,
+    Int64,
+    Int128,
+    UInt8,
+    UInt16,
+    UInt32,
+    UInt64,
+    UInt128,
+    Float32,
+    Float64,
+    String,
+    Other(Ident),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -140,6 +159,14 @@ impl TokenKind {
     pub fn expect_kind(self, kind: TokenKind) -> Option<Self> {
         if self == kind {
             Some(self)
+        } else {
+            None
+        }
+    }
+
+    pub fn expect_type(self) -> Option<TypeKind> {
+        if let TokenKind::BuiltInType(k) = self {
+            Some(k)
         } else {
             None
         }
@@ -409,6 +436,19 @@ impl<'a> Tokenizer<'a> {
             "use" => TokenKind::Keyword(KeywordKind::Use),
             "true" => TokenKind::Literal(LiteralKind::Boolean),
             "false" => TokenKind::Literal(LiteralKind::Boolean),
+            "Int8" => TokenKind::BuiltInType(TypeKind::Int8),
+            "Int16" => TokenKind::BuiltInType(TypeKind::Int16),
+            "Int32" => TokenKind::BuiltInType(TypeKind::Int32),
+            "Int64" => TokenKind::BuiltInType(TypeKind::Int64),
+            "Int128" => TokenKind::BuiltInType(TypeKind::Int128),
+            "UInt8" => TokenKind::BuiltInType(TypeKind::UInt8),
+            "UInt16" => TokenKind::BuiltInType(TypeKind::UInt16),
+            "UInt32" => TokenKind::BuiltInType(TypeKind::UInt32),
+            "UInt64" => TokenKind::BuiltInType(TypeKind::UInt64),
+            "UInt128" => TokenKind::BuiltInType(TypeKind::UInt128),
+            "Float32" => TokenKind::BuiltInType(TypeKind::Float32),
+            "Float64" => TokenKind::BuiltInType(TypeKind::Float64),
+            "String" => TokenKind::BuiltInType(TypeKind::String),
             other => {
                 if other.len() == 0 {
                     return TokenKind::Unknown;

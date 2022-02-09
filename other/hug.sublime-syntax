@@ -29,29 +29,39 @@ contexts:
     - match: '\b(enum|private|public|import)\b'
       scope: keyword.control.hug
 
-    - match: '\b(let|type|module|function)\b'
+    - match: '\b(implement)\b'
+      scope: keyword.variable.hug
+      push:
+        - meta_scope: entity.name.type
+        - match: '{'
+          scope: punctuation.section.block.start.hug
+          pop: true
+        - match: '\bfor\b'
+          scope: keyword.control.hug
+
+    - match: '\b(let|type|module|function|trait|struct)\b'
       scope: keyword.variable.hug
       push:
         - meta_scope: entity.name.variable.hug
         - match: ':'
-          scope: punctuation.definition.type.hug
           push:
-            - meta_scope: none.hug
-            - match: '\b{{ident}}\b'
-              scope: keyword.type.hug
+            - meta_scope: punctuation.definition.type.hug
+            - match: '.*?{{ident}}'
+              scope: entity.name.type.hug
               pop: true
         - match: '='
           scope: punctuation.definition.numeric.hug
           pop: true
-        - match: '\w+\b'
-          pop: true
-        - match: '{'
+        - match: '(\{|\()'
           scope: punctuation.section.block.start.hug
           pop: true
 
     # Numbers
     - match: '\b(-)?[0-9.]+\b'
       scope: constant.numeric.hug
+
+    - match: '{{ident}}(?=\(.+?\))'
+      scope: entity.name.function.hug
 
   double_quoted_string:
     - meta_scope: string.quoted.double.hug

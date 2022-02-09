@@ -1,3 +1,5 @@
+use std::{str::FromStr, ops::{Add, AddAssign, Sub, SubAssign, Div, DivAssign, Mul, MulAssign, Rem, RemAssign}};
+
 pub type HugExternalFunction = fn(std::vec::IntoIter<HugValue>) -> Option<HugValue>;
 
 macro_rules! gen_impls_for_HugValue {
@@ -62,4 +64,60 @@ impl HugValue {
     pub fn assert<T: FromHugValue>(&self) -> Option<T> {
         T::from_hug_value(self.clone())
     }
+}
+
+impl ToString for HugValue {
+    fn to_string(&self) -> String {
+        match self {
+            HugValue::Int8(v) => v.to_string(),
+            HugValue::Int16(v) => v.to_string(),
+            HugValue::Int32(v) => v.to_string(),
+            HugValue::Int64(v) => v.to_string(),
+            HugValue::Int128(v) => v.to_string(),
+            HugValue::UInt8(v) => v.to_string(),
+            HugValue::UInt16(v) => v.to_string(),
+            HugValue::UInt32(v) => v.to_string(),
+            HugValue::UInt64(v) => v.to_string(),
+            HugValue::UInt128(v) => v.to_string(),
+            HugValue::Float32(v) => v.to_string(),
+            HugValue::Float64(v) => v.to_string(),
+            HugValue::String(v) => v.clone(),
+            HugValue::Function(v) => format!("<Function [0x{:08x}]>", *v),
+            HugValue::ExternalFunction(v) => format!("<ExternalFunction [{:?}]>", v),
+        }
+    }
+}
+
+macro_rules! impl_op {
+    ($typ:ident, $ownvalue:ident, $rhs:ident, $operator:tt) => {
+        if let HugValue::$typ(v) = $rhs {
+            HugValue::from($ownvalue $operator v)
+        } else {
+            panic!("Can't add a value of type {} to another type!", stringify!($typ))
+        }
+    };
+}
+
+impl Add for HugValue {
+    type Output = HugValue;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        match self {
+            HugValue::Int8(v) => impl_op!(Int8, v, rhs, +),
+            HugValue::Int16(v) => impl_op!(Int16, v, rhs, +),
+            HugValue::Int32(v) => impl_op!(Int32, v, rhs, +),
+            HugValue::Int64(v) =>impl_op!(Int64, v, rhs, +),
+            HugValue::Int128(v) => impl_op!(Int128, v, rhs, +),
+            HugValue::UInt8(v) => impl_op!(UInt8, v, rhs, +),
+            HugValue::UInt16(v) => impl_op!(UInt16, v, rhs, +),
+            HugValue::UInt32(v) => impl_op!(UInt32, v, rhs, +),
+            HugValue::UInt64(v) => impl_op!(UInt64, v, rhs, +),
+            HugValue::UInt128(v) => impl_op!(UInt128, v, rhs, +),
+            HugValue::Float32(v) => impl_op!(Float32, v, rhs, +),
+            HugValue::Float64(v) => impl_op!(Float64, v, rhs, +),
+            HugValue::String(v) => todo!(),
+            _ => panic!("Cannot add values of these types!")
+        }
+    }
+    
 }
