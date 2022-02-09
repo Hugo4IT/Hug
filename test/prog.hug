@@ -9,8 +9,9 @@ print("This is a number: ", num)
 
 	import std.io;
 
-	fn main() {
-		print("Hello, World!")
+	fn ui(preon: Preon) {
+		preon.label("Hello, World!")
+		preon.beginRow()
 	}
 
 
@@ -31,8 +32,6 @@ print("This is a number: ", num)
 
 function printNum(num: Float32):
 	print("Wowie: ", num)
-
-	print("hoi")
 
 // Lua
 

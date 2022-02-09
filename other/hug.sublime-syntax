@@ -60,7 +60,7 @@ contexts:
     - match: '\b(-)?[0-9.]+\b'
       scope: constant.numeric.hug
 
-    - match: '{{ident}}(?=\(.+?\))'
+    - match: '{{ident}}(?=\()'
       scope: entity.name.function.hug
 
   double_quoted_string:
