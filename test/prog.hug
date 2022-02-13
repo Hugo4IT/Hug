@@ -9,23 +9,16 @@ print("This is a number: ", num)
 
 	import std.io;
 
-	fn ui(preon: Preon) {
-		preon.label("Hello, World!")
-		preon.beginRow()
+	fn ui(ctx: PreonContext) {
+		ctx.label("ToDo list")
+
+		foreach item in todoList {
+			ctx.beginRow()
+				ctx.checkbox(&item.isDone)
+				ctx.label(item.label)
+			ctx.endRow()
+		}
 	}
-
-
-
-
-
-
-
-	
-
-
-
-
-
 
 
 // Python
