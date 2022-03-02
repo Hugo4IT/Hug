@@ -1,3 +1,5 @@
+> NOTE: Latest working commit is [f961fc672a9f5f2bc3470c967ba3c49e2c3e03c5](https://github.com/Hugo4IT/Hug/tree/f961fc672a9f5f2bc3470c967ba3c49e2c3e03c5). I'm very busy at the moment so progress will be a little slow for a while.
+
 # hug
 
 My own lil easy-to-use programming language inspired by GDScript & Rust, focused on being beginner-friendly while providing advanced features and incredible speed.
