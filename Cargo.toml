@@ -1,9 +1,9 @@
 [workspace]
 members = [
-    "hug_lexer",
+    "hug_designer",
     "hug_core",
-    "hug_ast",
     "hug_lib",
-    "hug_bin",
     "hug_vm"
 ]
+resolver = "2"
+edition = "2021"

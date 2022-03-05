@@ -80,3 +80,8 @@ And lastly, disabling debug output:
 ```bash
 cargo run --release -- <args for hug>
 ```
+
+
+> Notes (my own):
+> 
+> - Add command menu that toggles with /

@@ -1,7 +1,8 @@
-use std::collections::HashMap;
-use value::HugValue;
-
-pub mod ext;
-pub mod value;
-pub mod ident;
-
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn it_works() {
+        let result = 2 + 2;
+        assert_eq!(result, 4);
+    }
+}
