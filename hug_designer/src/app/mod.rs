@@ -1,19 +1,31 @@
-use iced::{container, Column, Container, Element, Length, Row, Sandbox, Settings, Text};
+use iced::{Container, Element, Length, Sandbox, Settings};
 
-use self::theme::{colors, light};
+use self::views::{
+    editor::{EditorUpdate, EditorView},
+    projects::{ProjectUpdate, ProjectView},
+};
+
 mod theme;
+mod views;
 mod widgets;
 
 #[derive(Debug, Clone, Copy)]
 pub enum AppUpdate {
-    NumberChanged(i32),
-    ThemeChanged(theme::Theme),
+    EditorUpdate(EditorUpdate),
+    ProjectUpdate(ProjectUpdate),
+    ViewStateChanged(ViewState),
 }
 
-#[derive(Default)]
+#[derive(Debug, Clone, Copy)]
+pub enum ViewState {
+    Editor,
+    Projects,
+}
+
 struct App {
-    theme: theme::Theme,
-    number: i32,
+    editor_view: EditorView,
+    project_view: ProjectView,
+    current_view: ViewState,
 }
 
 impl Sandbox for App {
@@ -21,8 +33,9 @@ impl Sandbox for App {
 
     fn new() -> App {
         App {
-            theme: theme::Theme::default(),
-            number: 0,
+            editor_view: EditorView::new(),
+            project_view: ProjectView::new(),
+            current_view: ViewState::Projects,
         }
     }
 
@@ -32,60 +45,25 @@ impl Sandbox for App {
 
     fn update(&mut self, message: Self::Message) {
         match message {
-            AppUpdate::NumberChanged(num) => self.number = num,
-            AppUpdate::ThemeChanged(theme) => self.theme = theme,
+            AppUpdate::EditorUpdate(e) => self.editor_view.update(e),
+            AppUpdate::ProjectUpdate(p) => self.project_view.update(p),
+            AppUpdate::ViewStateChanged(v) => self.current_view = v,
         }
     }
 
     fn view(&mut self) -> Element<Self::Message> {
-        let content: Element<_> = Row::new()
-            .push(
-                Column::new()
-                    .push(
-                        Row::new()
-                            .push(Text::new("Top left"))
-                            .width(Length::Units(300))
-                            .height(Length::Units(64)),
-                    )
-                    .push(
-                        Row::new()
-                            .push(Text::new("Bottom left"))
-                            .width(Length::Units(300))
-                            .height(Length::Fill),
-                    ),
-            )
-            .push(
-                Column::new()
-                    .push(
-                        Row::new()
-                            .push(
-                                Container::new(Text::new("Bottom right"))
-                                    .width(Length::Fill)
-                                    .height(Length::Fill)
-                                    .style(light::ToolbarControls)
-                            )
-                                .width(Length::Fill)
-                                .height(Length::Units(64)),
-                    )
-                    .push(
-                        Row::new()
-                                .push(
-                                    Container::new(Column::new())
-                                        .width(Length::Fill)
-                                        .height(Length::Fill)
-                                        .style(light::ToolbarControls)
-                                )
-                                .width(Length::Fill)
-                                .height(Length::Fill),
-                    )
-                )
-                    .into();
+        let content: Element<_> = match self.current_view {
+            ViewState::Editor => self.editor_view.view(),
+            ViewState::Projects => self.project_view.view(),
+        }
+        .into();
+
+        #[cfg(feature = "explain")]
         let content = content.explain(colors::GRAY[9]);
 
         Container::new(content)
             .width(Length::Fill)
             .height(Length::Fill)
-            .style(self.theme)
             .into()
     }
 }
