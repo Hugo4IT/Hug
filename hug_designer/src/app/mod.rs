@@ -59,7 +59,7 @@ impl Sandbox for App {
         .into();
 
         #[cfg(feature = "explain")]
-        let content = content.explain(colors::GRAY[9]);
+        let content = content.explain(crate::app::theme::colors::GRAY[9]);
 
         Container::new(content)
             .width(Length::Fill)

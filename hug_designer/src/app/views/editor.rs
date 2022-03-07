@@ -95,7 +95,7 @@ class!(container SidebarFileSystem: container::Style {
 });
 
 class!(container Viewport: container::Style {
-    background: colors::GRAY[1].into(),
-    text_color: colors::GRAY[9].into(),
+    background: colors::GRAY[9].into(),
+    text_color: colors::GRAY[0].into(),
     ..Default::default()
 });
