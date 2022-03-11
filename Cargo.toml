@@ -6,4 +6,3 @@ members = [
     "hug_vm"
 ]
 resolver = "2"
-edition = "2021"

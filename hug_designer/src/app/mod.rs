@@ -1,31 +1,38 @@
-use iced::{Container, Element, Length, Sandbox, Settings};
-
-use self::views::{
-    editor::{EditorUpdate, EditorView},
-    projects::{ProjectUpdate, ProjectView},
+use iced::{
+    alignment::{Horizontal, Vertical},
+    button, container, Button, Color, Column, Container, Element, Length, Row, Sandbox, Settings,
+    Text, Vector,
 };
+use iced_native::Padding;
 
 mod theme;
-mod views;
 mod widgets;
 
 #[derive(Debug, Clone, Copy)]
 pub enum AppUpdate {
-    EditorUpdate(EditorUpdate),
-    ProjectUpdate(ProjectUpdate),
-    ViewStateChanged(ViewState),
+    SetAppState(AppState),
 }
 
 #[derive(Debug, Clone, Copy)]
-pub enum ViewState {
-    Editor,
-    Projects,
+pub enum AppState {
+    ProjectList { open_editor_button: button::State },
+    Editor {},
+}
+
+impl AppState {
+    pub fn new_project_list() -> AppState {
+        AppState::ProjectList {
+            open_editor_button: button::State::new(),
+        }
+    }
+
+    pub fn new_editor() -> AppState {
+        AppState::Editor {}
+    }
 }
 
 struct App {
-    editor_view: EditorView,
-    project_view: ProjectView,
-    current_view: ViewState,
+    state: AppState,
 }
 
 impl Sandbox for App {
@@ -33,9 +40,7 @@ impl Sandbox for App {
 
     fn new() -> App {
         App {
-            editor_view: EditorView::new(),
-            project_view: ProjectView::new(),
-            current_view: ViewState::Projects,
+            state: AppState::new_project_list(),
         }
     }
 
@@ -45,18 +50,108 @@ impl Sandbox for App {
 
     fn update(&mut self, message: Self::Message) {
         match message {
-            AppUpdate::EditorUpdate(e) => self.editor_view.update(e),
-            AppUpdate::ProjectUpdate(p) => self.project_view.update(p),
-            AppUpdate::ViewStateChanged(v) => self.current_view = v,
+            AppUpdate::SetAppState(s) => self.state = s,
         }
     }
 
     fn view(&mut self) -> Element<Self::Message> {
-        let content: Element<_> = match self.current_view {
-            ViewState::Editor => self.editor_view.view(),
-            ViewState::Projects => self.project_view.view(),
-        }
-        .into();
+        let content: Element<_> = match &mut self.state {
+            AppState::ProjectList { open_editor_button } => Row::new()
+                .push(
+                    Column::new()
+                        .height(Length::Fill)
+                        .width(Length::Units(300))
+                        .push(
+                            Container::new(
+                                Column::new()
+                                    .spacing(0)
+                                    .width(Length::Fill)
+                                    .height(Length::Shrink)
+                                    .padding(Padding::new(0))
+                                    .push(
+                                        Button::new(
+                                            open_editor_button,
+                                            Text::new("Go to Editor")
+                                                .vertical_alignment(Vertical::Center)
+                                                .horizontal_alignment(Horizontal::Center)
+                                                .height(Length::Fill)
+                                                .width(Length::Fill)
+                                                .size(32),
+                                        )
+                                        .on_press(AppUpdate::SetAppState(AppState::new_editor()))
+                                        .height(Length::Units(64))
+                                        .width(Length::Fill)
+                                        .style(SidebarButton),
+                                    ),
+                            )
+                            .align_y(Vertical::Center)
+                            .height(Length::Fill)
+                            .width(Length::Fill)
+                            .style(Sidebar),
+                        ),
+                )
+                .push(
+                    Column::new().height(Length::Fill).width(Length::Fill).push(
+                        Container::new(Row::new())
+                            .height(Length::Fill)
+                            .width(Length::Fill)
+                            .style(Overview),
+                    ),
+                )
+                .into(),
+            AppState::Editor {} => Row::new()
+                .push(
+                    Column::new()
+                        .push(
+                            Row::new()
+                                .push(
+                                    Container::new(Text::new("Top left"))
+                                        .width(Length::Fill)
+                                        .height(Length::Fill)
+                                        .style(ToolbarControls),
+                                )
+                                .width(Length::Units(300))
+                                .height(Length::Units(64)),
+                        )
+                        .push(
+                            Row::new()
+                                .push(
+                                    Container::new(Text::new("Bottom left"))
+                                        .width(Length::Fill)
+                                        .height(Length::Fill)
+                                        .style(SidebarFileSystem),
+                                )
+                                .width(Length::Units(300))
+                                .height(Length::Fill),
+                        ),
+                )
+                .push(
+                    Column::new()
+                        .push(
+                            Row::new()
+                                .push(
+                                    Container::new(Text::new("Top right"))
+                                        .width(Length::Fill)
+                                        .height(Length::Fill)
+                                        .style(ToolbarTabs),
+                                )
+                                .width(Length::Fill)
+                                .height(Length::Units(64)),
+                        )
+                        .push(
+                            Row::new()
+                                .push(
+                                    Container::new(Text::new("Bottom right"))
+                                        .width(Length::Fill)
+                                        .height(Length::Fill)
+                                        .style(Viewport),
+                                )
+                                .width(Length::Fill)
+                                .height(Length::Fill),
+                        ),
+                )
+                .into(),
+        };
 
         #[cfg(feature = "explain")]
         let content = content.explain(crate::app::theme::colors::GRAY[9]);
@@ -65,6 +160,91 @@ impl Sandbox for App {
             .width(Length::Fill)
             .height(Length::Fill)
             .into()
+    }
+}
+
+use crate::{app::theme::colors, class};
+
+class!(container ToolbarControls: container::Style {
+    background: colors::GRAY[4].into(),
+    text_color: colors::GRAY[9].into(),
+    ..Default::default()
+});
+
+class!(container ToolbarTabs: container::Style {
+    background: colors::GRAY[8].into(),
+    text_color: colors::GRAY[0].into(),
+    ..Default::default()
+});
+
+class!(container SidebarFileSystem: container::Style {
+    background: colors::GRAY[7].into(),
+    text_color: colors::GRAY[0].into(),
+    ..Default::default()
+});
+
+class!(container Viewport: container::Style {
+    background: colors::GRAY[9].into(),
+    text_color: colors::GRAY[0].into(),
+    ..Default::default()
+});
+
+class!(container Sidebar: container::Style {
+    text_color: colors::GRAY[0].into(),
+    background: colors::GRAY[8].into(),
+    ..Default::default()
+});
+
+class!(container Overview: container::Style {
+    text_color: colors::GRAY[0].into(),
+    background: colors::GRAY[9].into(),
+    ..Default::default()
+});
+
+pub struct SidebarButton;
+impl button::StyleSheet for SidebarButton {
+    fn active(&self) -> button::Style {
+        button::Style {
+            text_color: colors::GRAY[0].into(),
+            background: colors::GRAY[8].into(),
+            border_color: Color::TRANSPARENT,
+            border_radius: 0.0,
+            border_width: 0.0,
+            shadow_offset: Vector::new(0.0, 0.0),
+        }
+    }
+
+    fn hovered(&self) -> button::Style {
+        button::Style {
+            background: colors::GRAY[7].into(),
+            ..self.active()
+        }
+    }
+
+    fn pressed(&self) -> button::Style {
+        button::Style {
+            background: colors::GRAY[8].into(),
+            ..self.active()
+        }
+    }
+
+    fn disabled(&self) -> button::Style {
+        let active = self.active();
+
+        button::Style {
+            shadow_offset: Vector::default(),
+            background: active.background.map(|background| match background {
+                iced::Background::Color(color) => iced::Background::Color(Color {
+                    a: color.a * 0.5,
+                    ..color
+                }),
+            }),
+            text_color: Color {
+                a: active.text_color.a * 0.5,
+                ..active.text_color
+            },
+            ..active
+        }
     }
 }
 
