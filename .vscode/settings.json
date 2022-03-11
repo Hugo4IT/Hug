@@ -6,6 +6,5 @@
         "**/CVS": true,
         "**/.DS_Store": true,
         "**/Thumbs.db": true,
-        "**/*.old": true,
     },
 }

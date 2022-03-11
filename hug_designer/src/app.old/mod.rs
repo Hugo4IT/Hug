@@ -1,11 +1,11 @@
 use iced::{
     alignment::{Horizontal, Vertical},
-    button, container, Button, Color, Column, Container, Element, Length, Row, Sandbox, Settings,
-    Text, Vector,
+    button, container, Alignment, Button, Color, Column, Container, Element, Length, Row, Sandbox,
+    Settings, Text, Vector,
 };
 use iced_native::Padding;
 
-mod theme;
+pub mod theme;
 mod widgets;
 
 #[derive(Debug, Clone, Copy)]
@@ -15,8 +15,12 @@ pub enum AppUpdate {
 
 #[derive(Debug, Clone, Copy)]
 pub enum AppState {
-    ProjectList { open_editor_button: button::State },
-    Editor {},
+    ProjectList {
+        open_editor_button: button::State,
+    },
+    Editor {
+        back_to_project_list_button: button::State,
+    },
 }
 
 impl AppState {
@@ -27,7 +31,9 @@ impl AppState {
     }
 
     pub fn new_editor() -> AppState {
-        AppState::Editor {}
+        AppState::Editor {
+            back_to_project_list_button: button::State::new(),
+        }
     }
 }
 
@@ -99,16 +105,32 @@ impl Sandbox for App {
                     ),
                 )
                 .into(),
-            AppState::Editor {} => Row::new()
+            AppState::Editor {
+                back_to_project_list_button,
+            } => Row::new()
                 .push(
                     Column::new()
                         .push(
                             Row::new()
                                 .push(
-                                    Container::new(Text::new("Top left"))
+                                    Container::new(
+                                        Row::with_children(vec![Button::new(
+                                            back_to_project_list_button,
+                                            Text::new("Back to projects"),
+                                        )
+                                        .on_press(AppUpdate::SetAppState(
+                                            AppState::new_project_list(),
+                                        ))
+                                        .into()])
+                                        .padding(Padding::new(16))
+                                        .spacing(8)
                                         .width(Length::Fill)
                                         .height(Length::Fill)
-                                        .style(ToolbarControls),
+                                        .align_items(Alignment::Center),
+                                    ) // Top Left
+                                    .width(Length::Fill)
+                                    .height(Length::Fill)
+                                    .style(ToolbarControls),
                                 )
                                 .width(Length::Units(300))
                                 .height(Length::Units(64)),

@@ -2,12 +2,13 @@
 name = "hug_designer"
 version = "0.1.0"
 edition = "2021"
+strip = true
 
 [features]
 default = []
 explain = []
 
 [dependencies]
-egui = "0.17"
+eframe = "0.17"
 iced = { git = "https://github.com/iced-rs/iced", rev = "4411da25cfcfddab138dadd05e92f9bd4db1b763" }
 iced_native = { git = "https://github.com/iced-rs/iced", rev = "4411da25cfcfddab138dadd05e92f9bd4db1b763" }
