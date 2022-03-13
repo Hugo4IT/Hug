@@ -325,7 +325,7 @@ def compile(options):
     whitespaces = 0
     _lexems = []
     for lexem in lexems:
-        if type(lexem) == LComment:
+        if lexem.__class__.TYPE_ID == LComment.TYPE_ID:
             logging.debug("Removing: %s", str(lexem))
             comments += 1
         elif lexem.__class__.TYPE_ID == LWhitespace.TYPE_ID:
