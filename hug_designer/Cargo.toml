@@ -10,5 +10,5 @@ explain = []
 
 [dependencies]
 eframe = "0.17"
-iced = { git = "https://github.com/iced-rs/iced", rev = "4411da25cfcfddab138dadd05e92f9bd4db1b763" }
-iced_native = { git = "https://github.com/iced-rs/iced", rev = "4411da25cfcfddab138dadd05e92f9bd4db1b763" }
+bincode = "1.3"
+app_dirs = "2.0"

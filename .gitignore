@@ -6,5 +6,6 @@
 **/.vscode
 **/target
 **/.idea
+**/__pycache__
 test.sh
 compile_commands.json
