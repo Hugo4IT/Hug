@@ -1,8 +1,0 @@
-[workspace]
-members = [
-    "hug_designer",
-    "hug_core",
-    "hug_lib",
-    "hug_vm"
-]
-resolver = "2"
