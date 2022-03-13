@@ -9,6 +9,7 @@ Description: Entry point for bootstrapper located in bootstrap/compiler.py
 """
 
 import sys
+import time
 import logging
 import colorama
 import bootstrap.compiler as compiler
@@ -100,4 +101,7 @@ def main():
     compiler.compile(options)
 
 if __name__ == "__main__":
+    starttime = time.time()
     main()
+    duration = time.time() - starttime
+    logging.info("Done in %fs", duration)

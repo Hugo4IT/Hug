@@ -14,19 +14,17 @@ import colorama
 
 KEYWORDS = [
     "let",
-    "const",
-    "struct",
-    "enum",
+    "if",
 ]
 
 HIGHLIGHT_COLORS = [
-    colorama.Style.DIM,                                     # LComment
-    colorama.Style.NORMAL,                                  # LUnknown
-    colorama.Style.NORMAL,                                  # LWhitespace
-    colorama.Fore.LIGHTMAGENTA_EX + colorama.Style.BRIGHT,  # LKeyword
-    colorama.Fore.LIGHTCYAN_EX + colorama.Style.NORMAL,     # LIdent
-    colorama.Fore.LIGHTYELLOW_EX + colorama.Style.NORMAL,   # LLiteral
-    colorama.Style.NORMAL,                                  # LOperator
+    colorama.Style.DIM,                                                 # LComment
+    colorama.Style.NORMAL + colorama.Back.RED + colorama.Fore.WHITE,    # LUnknown
+    colorama.Style.NORMAL,                                              # LWhitespace
+    colorama.Fore.LIGHTMAGENTA_EX + colorama.Style.BRIGHT,              # LKeyword
+    colorama.Fore.LIGHTCYAN_EX + colorama.Style.NORMAL,                 # LIdent
+    colorama.Fore.LIGHTYELLOW_EX + colorama.Style.NORMAL,               # LLiteral
+    colorama.Style.NORMAL,                                              # LOperator
 ]
 
 class DebugInfo:
@@ -229,7 +227,7 @@ class Lexer:
         if ch != "":
             textbuffer = ch
             if ch.isalpha():
-                while self.peek(1).isalpha():
+                while self.peek(1).isalnum():
                     textbuffer += self.next()
                 
                 if textbuffer in ["true", "false"]:
