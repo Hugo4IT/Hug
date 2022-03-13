@@ -1,4 +1,15 @@
 > NOTE: Latest working commit is [f961fc672a9f5f2bc3470c967ba3c49e2c3e03c5](https://github.com/Hugo4IT/Hug/tree/f961fc672a9f5f2bc3470c967ba3c49e2c3e03c5). I'm very busy at the moment so progress will be a little slow for a while.
+> 
+> Progress: I have decided to make a bootstrap compiler in python, then later make Hug self-hosted. You can follow progress here:
+> 
+> - [X] Command line arguments
+> - [X] Lexer
+> - [X] Syntax highlighting engine
+> - [ ] Identifier table builder
+> - [ ] Syntax tree builder
+> - [ ] Compling to assembly
+> - [ ] Assembling to machine code (using NASM or fasm)
+> - [ ] Linking with other libraries like `libc`
 
 # hug
 
