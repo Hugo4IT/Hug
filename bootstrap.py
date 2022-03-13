@@ -58,7 +58,7 @@ def printusage():
     print(colorama.Fore.MAGENTA + "  python3" + colorama.Style.RESET_ALL + colorama.Style.DIM + " ./bootstrap.py" + colorama.Style.RESET_ALL + "[options] <file>")
     print()
     print("Available options:")
-    print("  --verbose,-v                Enable verbose output (same as --log-level DEBUG)")
+    print("  --verbose,-v                Enable verbose output (same as --log-level INFO)")
     print("  --help,-h                   Print this help message")
     print("  --version,-V                Print the current version of bootstrap.py")
     print("  --log-level,-l <level>      Increase/decrease output verbosity (<level>: [error, warning, info, debug])")
@@ -74,7 +74,7 @@ def main():
         if currentarg == "":
             if arg.startswith("--") or arg.startswith("-"):
                 if arg == "--verbose" or arg == "-v":
-                    options.loglevel = "DEBUG"
+                    options.loglevel = "INFO"
                 elif arg == "--help" or arg == "-h":
                     printusage()
                     return

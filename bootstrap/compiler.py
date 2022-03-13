@@ -25,6 +25,7 @@ HIGHLIGHT_COLORS = [
     colorama.Fore.LIGHTCYAN_EX + colorama.Style.NORMAL,                 # LIdent
     colorama.Fore.LIGHTYELLOW_EX + colorama.Style.NORMAL,               # LLiteral
     colorama.Style.NORMAL,                                              # LOperator
+    colorama.Style.NORMAL,                                              # LMisc                                            # LOperator
 ]
 
 class DebugInfo:
@@ -194,10 +195,28 @@ class LOperator(Lexem):
         super().__init__(text, debuginfo)
         self.operator = operator
 
+class LMisc(Lexem):
+    TYPE_ID = 7
+
+    OPENBRACE = 0                   # {
+    CLOSEBRACE = 1                  # }
+    OPENBRACKET = 2                 # [
+    CLOSEBRACKET = 3                # ]
+    OPENPARENTHESIS = 4             # (
+    CLOSEPARENTHESIS = 5            # )
+    COLON = 6                       # :
+    COMMA = 7                       # ,
+    DOT = 8                         # .
+
+    def __init__(self, text: str, debuginfo: DebugInfo, value: int):
+        super().__init__(text, debuginfo)
+        self.value = value
+
 class Lexer:
-    def __init__(self, options, file):
+    def __init__(self, options, filepath):
         self.options = options
-        self.file = file
+        self.filepath = filepath
+        self.file = requestfile(filepath)
         self.index = -1
         self.lexems = []
 
@@ -254,7 +273,7 @@ class Lexer:
                     return LComment(textbuffer, self.debuginfo, LComment.BLOCK_COMMENT)
                 elif nch == "=":
                     textbuffer += self.next() # =
-                    return LOperator(ch, self.debuginfo, LOperator.DIVASSIGN)
+                    return LOperator(textbuffer, self.debuginfo, LOperator.DIVASSIGN)
                 else:
                     return LOperator(ch, self.debuginfo, LOperator.DIV)
             elif ch == "=":
@@ -264,6 +283,102 @@ class Lexer:
                     return LOperator(textbuffer, self.debuginfo, LOperator.EQUALS)
                 else:
                     return LOperator(textbuffer, self.debuginfo, LOperator.ASSIGN)
+            elif ch == "+":
+                if self.peek(1) == "=":
+                    return LOperator(ch + self.next(), self.debuginfo, LOperator.ADDASSIGN)
+                elif self.peek(1) == "+":
+                    return LOperator(ch + self.next(), self.debuginfo, LOperator.INCREMENT)
+                else:
+                    return LOperator(ch, self.debuginfo, LOperator.ADD)
+            elif ch == "-":
+                if self.peek(1) == "=":
+                    return LOperator(ch + self.next(), self.debuginfo, LOperator.SUBASSIGN)
+                elif self.peek(1) == "-":
+                    return LOperator(ch + self.next(), self.debuginfo, LOperator.DECREMENT)
+                else:
+                    return LOperator(ch, self.debuginfo, LOperator.SUB)
+            elif ch == "*":
+                if self.peek(1) == "=":
+                    return LOperator(ch + self.next(), self.debuginfo, LOperator.MULASSIGN)
+                else:
+                    return LOperator(ch, self.debuginfo, LOperator.MUL)
+            elif ch == "&":
+                if self.peek(1) == "=":
+                    return LOperator(ch + self.next(), self.debuginfo, LOperator.BITWISEANDASSIGN)
+                elif self.peek(1) == "&":
+                    return LOperator(ch + self.next(), self.debuginfo, LOperator.AND)
+                else:
+                    return LOperator(ch, self.debuginfo, LOperator.BITWISEAND)
+            elif ch == "|":
+                if self.peek(1) == "=":
+                    return LOperator(ch + self.next(), self.debuginfo, LOperator.BITWISEORASSIGN)
+                elif self.peek(1) == "|":
+                    return LOperator(ch + self.next(), self.debuginfo, LOperator.OR)
+                else:
+                    return LOperator(ch, self.debuginfo, LOperator.BITWISEORASSIGN)
+            elif ch == "!":
+                if self.peek(1) == "=":
+                    return LOperator(ch + self.next(), self.debuginfo, LOperator.NOTEQUALS)
+                else:
+                    return LOperator(ch, self.debuginfo, LOperator.NOT)
+            elif ch == "%":
+                if self.peek(1) == "=":
+                    return LOperator(ch + self.next(), self.debuginfo, LOperator.MODULOASSIGN)
+                else:
+                    return LOperator(ch, self.debuginfo, LOperator.MODULO)
+            elif ch == "^":
+                if self.peek(1) == "=":
+                    return LOperator(ch + self.next(), self.debuginfo, LOperator.BITWISEXORASSIGN)
+                else:
+                    return LOperator(ch, self.debuginfo, LOperator.BITWISEXOR)
+            elif ch == "~":
+                return LOperator(ch, self.debuginfo, LOperator.BITWISENOT)
+            elif ch == "<":
+                nch = self.peek(1)
+                if nch == "<":
+                    nch2 = self.peek(2)
+                    if nch2 == "=":
+                        return LOperator(ch + self.next() + self.next(), self.debuginfo, LOperator.SHIFTLEFTASSIGN)
+                    elif nch2 == "<":
+                        if self.peek(3) == "=":
+                            return LOperator(ch + self.next() + self.next() + self.next(), self.debuginfo, LOperator.SHIFTLEFTOVERFLOWASSIGN)
+                        else:
+                            return LOperator(ch + self.next() + self.next(), self.debuginfo, LOperator.SHIFTLEFTOVERFLOW)
+                    else:
+                        return LOperator(ch + self.next(), self.debuginfo, LOperator.SHIFTLEFT)
+                elif nch == "=":
+                    return LOperator(ch + self.next(), self.debuginfo, LOperator.LESSTHANOREQUALS)
+                else:
+                    return LOperator(ch, self.debuginfo, LOperator.LESSTHAN)
+            elif ch == ">":
+                nch = self.peek(1)
+                if nch == ">":
+                    nch2 = self.peek(2)
+                    if nch2 == "=":
+                        return LOperator(ch + self.next() + self.next(), self.debuginfo, LOperator.SHIFTRIGHTASSIGN)
+                    elif nch2 == ">":
+                        if self.peek(3) == "=":
+                            return LOperator(ch + self.next() + self.next() + self.next(), self.debuginfo, LOperator.SHIFTRIGHTOVERFLOWASSIGN)
+                        else:
+                            return LOperator(ch + self.next() + self.next(), self.debuginfo, LOperator.SHIFTRIGHTOVERFLOW)
+                    else:
+                        return LOperator(ch + self.next(), self.debuginfo, LOperator.SHIFTRIGHT)
+                elif nch == "=":
+                    return LOperator(ch + self.next(), self.debuginfo, LOperator.GREATERTHANOREQUALS)
+                else:
+                    return LOperator(ch, self.debuginfo, LOperator.GREATERTHAN)
+            elif ch == "{":
+                return LMisc(ch, self.debuginfo, LMisc.OPENBRACE)
+            elif ch == "}":
+                return LMisc(ch, self.debuginfo, LMisc.CLOSEBRACE)
+            elif ch == "[":
+                return LMisc(ch, self.debuginfo, LMisc.OPENBRACKET)
+            elif ch == "]":
+                return LMisc(ch, self.debuginfo, LMisc.CLOSEBRACKET)
+            elif ch == "(":
+                return LMisc(ch, self.debuginfo, LMisc.OPENPARENTHESIS)
+            elif ch == ")":
+                return LMisc(ch, self.debuginfo, LMisc.CLOSEPARENTHESIS)
             elif ch.isnumeric():
                 ty = LLiteral.TYPE_INT32
                 while self.peek(1).isnumeric() or (self.peek(1) == "." and ty == LLiteral.TYPE_INT32):
@@ -285,6 +400,29 @@ class Lexer:
                 logging.debug("Found lexem: %s", str(_l))
         
         return self.lexems
+    
+    def trim(self):
+        logging.info("Filtering LWhitespace, LComment and LUnknown...")
+
+        comments = 0
+        unknowns = 0
+        whitespaces = 0
+        _lexems = []
+        for lexem in self.lexems:
+            if lexem.__class__.TYPE_ID == LComment.TYPE_ID:
+                logging.debug("Removing: %s", str(lexem))
+                comments += 1
+            elif lexem.__class__.TYPE_ID == LWhitespace.TYPE_ID:
+                logging.debug("Removing: %s", str(lexem))
+                whitespaces += 1
+            elif lexem.__class__.TYPE_ID == LUnknown.TYPE_ID:
+                logging.warning("Unknown token: %s (in %s:%d:%d)", repr(lexem.text), self.filepath, lexem.sline, lexem.scolumn)
+                logging.debug("Removing: %s", str(lexem))
+                unknowns += 1
+            else:
+                _lexems.append(lexem)
+        self.lexems = _lexems
+        logging.info("Removed %d whitespace(s), %d comment(s) and %d unknown(s)", whitespaces, comments, unknowns)
 
 def requestfile(filename) -> str:
     if not os.path.exists(filename):
@@ -309,36 +447,11 @@ def compile(options):
     logging.info("Input file received: %s", colorama.Style.BRIGHT + colorama.Fore.LIGHTYELLOW_EX + options.inputfile)
     logging.info("Entering phase 1 - Lexical Analysis")
 
-    lexer = Lexer(options, requestfile(options.inputfile))
+    lexer = Lexer(options, options.inputfile)
     lexems = lexer.start()
 
     if options.highlight:
         print(highlight(lexems))
     
     logging.info("Preparing for phase 2...")
-    logging.info("Filtering LWhitespace, LComment and LUnknown...")
-
-    comments = 0
-    unknowns = 0
-    whitespaces = 0
-    _lexems = []
-    for lexem in lexems:
-        if lexem.__class__.TYPE_ID == LComment.TYPE_ID:
-            logging.debug("Removing: %s", str(lexem))
-            comments += 1
-        elif lexem.__class__.TYPE_ID == LWhitespace.TYPE_ID:
-            logging.debug("Removing: %s", str(lexem))
-            whitespaces += 1
-        elif lexem.__class__.TYPE_ID == LUnknown.TYPE_ID:
-            logging.warning("Unknown token: %s on line %d column %d", repr(lexem.text), lexem.sline, lexem.scolumn)
-            logging.debug("Removing: %s", str(lexem))
-            unknowns += 1
-        else:
-            _lexems.append(lexem)
-    lexems = _lexems
-
-    logging.info("Removed %d whitespace(s), %d comment(s) and %d unknown(s)", whitespaces, comments, unknowns)
-
-    if options.highlight and logging.getLogger().level <= logging.INFO:
-        logging.info("Syntax highlighting after filter:")
-        print(highlight(lexems))
+    lexer.trim()
