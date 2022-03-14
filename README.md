@@ -2,14 +2,14 @@
 > 
 > Progress: I have decided to make a bootstrap compiler in python, then later make Hug self-hosted. You can follow progress here:
 > 
-> - [X] Command line arguments
-> - [X] Lexer
-> - [X] Syntax highlighting engine
-> - [ ] Identifier table builder
-> - [ ] Syntax tree builder
-> - [ ] Compling to assembly
-> - [ ] Assembling to machine code (using NASM or fasm)
-> - [ ] Linking with other libraries like `libc`
+> - [X] Command line arguments (`bootstrap.py`)
+> - [X] Lexical Analysis (`bootstrap/lexer.py`)
+> - [X] Syntax highlighting engine (`bootsrap/lexer.py`)
+> - [ ] Syntactic Analysis (`bootstrap/syntax.py`)
+> - [ ] Semantic Analysis (`bootstrap/ident.py`)
+> - [ ] Compling to assembly (`bootstrap/compiler.py`)
+> - [ ] Assembling to machine code using NASM or fasm (`bootstrap/linker.py`)
+> - [ ] Linking with other libraries like `libc` (`bootstrap/linker.py`)
 
 # hug
 

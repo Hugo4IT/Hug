@@ -16,6 +16,17 @@ import bootstrap.compiler as compiler
 
 LOGGING_FMT_BASE = colorama.Style.DIM + "%(asctime)s" + colorama.Style.RESET_ALL + " $$LOG_COLOR$$[%(levelname)s]: " + colorama.Style.RESET_ALL + colorama.Fore.LIGHTCYAN_EX + "%(message)s" + colorama.Style.RESET_ALL
 
+class CountHandler(logging.Handler):
+    def __init__(self):
+        super().__init__()
+        self.count = 0
+
+    def emit(self, record: logging.LogRecord):
+        self.count += 1
+    
+    def resetcount(self):
+        self.count = 0
+
 class Options:
     def __init__(self):
         self.loglevel = "WARNING"
@@ -44,11 +55,21 @@ class Options:
         warninghandler.setFormatter(logging.Formatter(LOGGING_FMT_BASE.replace("$$LOG_COLOR$$", colorama.Style.BRIGHT + colorama.Fore.LIGHTYELLOW_EX)))
         logger.addHandler(warninghandler)
 
+        self.warningcounter = CountHandler()
+        self.warningcounter.setLevel(logging.WARNING)
+        self.warningcounter.addFilter(lambda r: r.levelno == logging.WARNING)
+        logger.addHandler(self.warningcounter)
+
         errorhandler = logging.StreamHandler()
         errorhandler.setLevel(logging.ERROR)
         errorhandler.addFilter(lambda r: r.levelno == logging.ERROR or r.levelno == logging.CRITICAL)
         errorhandler.setFormatter(logging.Formatter(LOGGING_FMT_BASE.replace("$$LOG_COLOR$$", colorama.Style.BRIGHT + colorama.Fore.LIGHTRED_EX)))
         logger.addHandler(errorhandler)
+
+        self.errorcounter = CountHandler()
+        self.errorcounter.setLevel(logging.ERROR)
+        self.errorcounter.addFilter(lambda r: r.levelno == logging.ERROR or r.levelno == logging.CRITICAL)
+        logger.addHandler(self.errorcounter)
 
         if self.inputfile == "":
             logging.critical("No input file given!")
@@ -99,6 +120,7 @@ def main():
     options.finish()
 
     compiler.compile(options)
+
 
 if __name__ == "__main__":
     starttime = time.time()

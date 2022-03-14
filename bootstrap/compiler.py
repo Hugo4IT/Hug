@@ -22,5 +22,15 @@ def compile(options):
     if options.highlight:
         print(lexer.highlight())
     
-    logging.info("Preparing for phase 2...")
     lexer.trim()
+    if options.errorcounter.count > 0:
+        while True:
+            answer = input("%d error(s) occured during phase 1 of compiling, continue? (y/N)" % options.errorcounter.count).lower()
+            if answer == "no" or answer == "n" or answer == "":
+                quit()
+                break
+            elif answer == "yes" or answer == "y":
+                break
+            else:
+                print("Unrecognized input, please choose y or n")
+    options.errorcounter.resetcount()
