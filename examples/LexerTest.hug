@@ -1,3 +1,6 @@
+// This example is for testing the lexer,
+// not functionality
+
 // ✅ Comments
 /* ✅ */ // Line Comment
 /* ✅ */ /* Block Comment */
@@ -12,25 +15,25 @@
 /* ✅ */ let variable = 4.4
 /* ✅ */ if true {}
 
-// 🚧 Literals
-/* ❌ */ let int8Test = 10
-/* ❌ */ let int16Test = 10
+// ✅ Literals
+/* ✅ */ let int8Test: Int8 = 10
+/* ✅ */ let int16Test: Int16 = 10
 /* ✅ */ let int32Test = 10
-/* ❌ */ let int64Test = 10
-/* ❌ */ let int128Test = 10
-/* ❌ */ let intArchTest = 10
-/* ❌ */ let uint8Test = 10
-/* ❌ */ let uint16Test = 10
-/* ❌ */ let uint32Test = 10
-/* ❌ */ let uint64Test = 10
-/* ❌ */ let uint128Test = 10
-/* ❌ */ let uintArchTest = 10
-/* ✅ */ let float32Test = 809354.24379
-/* ❌ */ let float64Test = 9430798570.25908
-/* ❌ */ let charTest = 'W'
-/* ❌ */ let stringTest = "wowie"
+/* ✅ */ let int64Test: Int64 = 10
+/* ✅ */ let int128Test: Int128 = 10
+/* ✅ */ let intArchTest: IntArch = 10
+/* ✅ */ let uint8Test: UInt8 = 10
+/* ✅ */ let uint16Test: UInt16 = 10
+/* ✅ */ let uint32Test: UInt32 = 10
+/* ✅ */ let uint64Test: UInt64 = 10
+/* ✅ */ let uint128Test UInt128 = 10
+/* ✅ */ let uintArchTest: UIntArch = 10
+/* ✅ */ let float32Test: Float32 = 809354.24379
+/* ✅ */ let float64Test = 9430798570.25908
+/* ✅ */ let charTest = 'W'
+/* ✅ */ let stringTest = "wowie"
 
-// 🚧 Operators
+// ✅ Operators
 /* ✅ */ let result = 5 + 9
 /* ✅ */ result = 25 - 13
 /* ✅ */ result = 3 * 5
@@ -60,7 +63,7 @@
 /* ✅ */ result++
 /* ✅ */ result--
 
-// 🚧 Conditions
+// ✅ Conditions
 /* ✅ */ let isFifteen = result == 15
 /* ✅ */ let isNotFifteen = result != 15
 /* ✅ */ let alwaysTrue = isFifteen || isNotFifteen

@@ -14,7 +14,7 @@ import logging
 import colorama
 import bootstrap.compiler as compiler
 
-LOGGING_FMT_BASE = colorama.Style.DIM + "%(asctime)s %(filename)s:%(lineno)-3d" + colorama.Style.RESET_ALL + " $$LOG_COLOR$$[%(levelname)s]: " + colorama.Style.RESET_ALL + colorama.Fore.LIGHTCYAN_EX + "%(message)s" + colorama.Style.RESET_ALL
+LOGGING_FMT_BASE = colorama.Style.DIM + "%(asctime)s" + colorama.Style.RESET_ALL + " $$LOG_COLOR$$[%(levelname)s]: " + colorama.Style.RESET_ALL + colorama.Fore.LIGHTCYAN_EX + "%(message)s" + colorama.Style.RESET_ALL
 
 class Options:
     def __init__(self):
