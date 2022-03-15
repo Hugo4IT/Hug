@@ -12,6 +12,7 @@ import logging
 import colorama
 from .lexer import Lexer
 from .syntax import ParseTree
+from .ident import SymbolTable
 
 def compile(options):
     logging.info("Input file received: %s", colorama.Style.BRIGHT + colorama.Fore.LIGHTYELLOW_EX + options.inputfile)
@@ -35,3 +36,10 @@ def compile(options):
             else:
                 print("Unrecognized input, please choose y or n")
     options.errorcounter.resetcount()
+
+    logging.info("Entering phase 2 - Syntax Analysis")
+    parsetree = ParseTree(lexer)
+
+    logging.info("SymbolTable:");
+    for line in str(SymbolTable.instance()).split("\n"):
+        logging.info(line)

@@ -38,17 +38,17 @@ class DebugInfo:
         self.scolumn = self.ecolumn
     
     def clone(self) -> (int, int, int):
-        return self.sline, self.scolumn, self.eline, self.ecolumn
+        return self.sline, self.scolumn, self.eline, self.ecolumn, self.filepath
 
 class Lexem:
     def __init__(self, text: str, debuginfo: DebugInfo):
         self.text = text
-        self.sline, self.scolumn, self.eline, self.ecolumn = debuginfo.clone()
+        self.sline, self.scolumn, self.eline, self.ecolumn, self.ifile = debuginfo.clone()
     
     def __str__(self) -> str:
         buffer = self.__class__.__name__ + "("
         for name,value in self.__dict__.items():
-            if not name in ["sline", "scolumn", "eline", "ecolumn"]:
+            if not name in ["sline", "scolumn", "eline", "ecolumn", "ifile"]:
                 buffer += "\'" + name + "\': " + repr(str(value)) + ", "
         return buffer[0:len(buffer)-2] + ")"
 
@@ -89,25 +89,12 @@ class LIdent(Lexem):
 class LLiteral(Lexem):
     TYPE_ID = 5
 
-    TYPE_INT8 = 0
-    TYPE_INT16 = 1
-    TYPE_INT32 = 2
-    TYPE_INT64 = 3
-    TYPE_INT128 = 4
-    TYPE_INTARCH = 5
-
-    TYPE_UINT8 = 6
-    TYPE_UINT16 = 7
-    TYPE_UINT32 = 8
-    TYPE_UINT64 = 9
-    TYPE_UINT128 = 10
-    TYPE_UINTARCH = 11
-
-    TYPE_FLOAT32 = 12
-    TYPE_FLOAT64 = 13
-
-    TYPE_CHAR = 14
-    TYPE_STRING = 15
+    # Only some basic types, actual type depends on target variable
+    TYPE_INT = 0
+    TYPE_FLOAT = 1
+    TYPE_BOOL = 2
+    TYPE_CHAR = 3
+    TYPE_STRING = 4
 
     def __init__(self, text: str, debuginfo: DebugInfo):
         super().__init__(text, debuginfo)
@@ -129,15 +116,15 @@ class LLiteral(Lexem):
             else:
                 return None, LLiteral.TYPE_CHAR # Invalid literal
         elif text == "true":
-            return 1, LLiteral.TYPE_INT8
+            return 1, LLiteral.TYPE_BOOL
         elif text == "false":
-            return 0, LLiteral.TYPE_INT8
+            return 0, LLiteral.TYPE_BOOL
         elif "." in text:
-            return float(text), LLiteral.TYPE_FLOAT32
+            return float(text), LLiteral.TYPE_FLOAT
         elif text.isnumeric():
-            return int(text), LLiteral.TYPE_INT32
+            return int(text), LLiteral.TYPE_INT
         else:
-            return None, LLiteral.TYPE_INT8
+            return None, LLiteral.TYPE_BOOL
 
 class LOperator(Lexem):
     TYPE_ID = 6
@@ -404,12 +391,12 @@ class Lexer:
                 textbuffer += self.next() # Final quotationmark
                 return LLiteral(textbuffer, self.debuginfo)
             elif ch.isnumeric():
-                ty = LLiteral.TYPE_INT32
-                while self.peek(1).isnumeric() or (self.peek(1) == "." and ty == LLiteral.TYPE_INT32):
+                ty = LLiteral.TYPE_INT
+                while self.peek(1).isnumeric() or (self.peek(1) == "." and ty == LLiteral.TYPE_INT):
                     nch = self.next()
                     textbuffer += nch
                     if nch == ".":
-                        ty = LLiteral.TYPE_FLOAT32
+                        ty = LLiteral.TYPE_FLOAT
                 return LLiteral(textbuffer, self.debuginfo)
             else:
                 return LUnknown(ch, self.debuginfo)
@@ -433,13 +420,13 @@ class Lexer:
         whitespaces = 0
         _lexems = []
         for lexem in self.lexems:
-            if lexem.__class__.TYPE_ID == LComment.TYPE_ID:
+            if type(lexem) == LComment:
                 logging.debug("Removing: %s", str(lexem))
                 comments += 1
-            elif lexem.__class__.TYPE_ID == LWhitespace.TYPE_ID:
+            elif type(lexem) == LWhitespace:
                 logging.debug("Removing: %s", str(lexem))
                 whitespaces += 1
-            elif lexem.__class__.TYPE_ID == LUnknown.TYPE_ID:
+            elif type(lexem) == LUnknown:
                 logging.error("Unknown token: %s (in %s:%d:%d)", repr(lexem.text), self.filepath, lexem.sline, lexem.scolumn)
                 logging.debug("Removing: %s", str(lexem))
                 unknowns += 1
