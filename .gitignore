@@ -4,7 +4,6 @@
 **/.cache
 **/bin
 **/.vscode
-**/target
 **/.idea
 **/__pycache__
 test.sh

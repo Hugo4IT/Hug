@@ -11,6 +11,7 @@ Description: A Hug compiler implemented in python to compile the official Hug co
 import logging
 import colorama
 from .lexer import Lexer
+from .syntax import ParseTree
 
 def compile(options):
     logging.info("Input file received: %s", colorama.Style.BRIGHT + colorama.Fore.LIGHTYELLOW_EX + options.inputfile)
