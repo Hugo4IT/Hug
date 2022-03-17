@@ -160,4 +160,4 @@ class Symbol:
         if self.scope == None:
             return self.name
         else:
-            return str(self.scope) + "." + self.name
+            return str(self.scope) + "::" + self.name

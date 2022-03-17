@@ -4,19 +4,21 @@ from .symbol import Symbol, Type
 from .lexer import Lexer, Lexem, LIdent, LKeyword, LMisc, LLiteral, LOperator
 
 ASSIGNMENT_OPERATORS = [
-    LOperator.ASSIGN, LOperator.ADDASSIGN, LOperator.BITWISEANDASSIGN,
-    LOperator.BITWISEORASSIGN, LOperator.BITWISEXORASSIGN, LOperator.DIVASSIGN,
-    LOperator.MODULOASSIGN, LOperator.MULASSIGN, LOperator.SHIFTLEFTASSIGN,
-    LOperator.SHIFTLEFTOVERFLOWASSIGN, LOperator.SHIFTRIGHTASSIGN,
-    LOperator.SHIFTRIGHTOVERFLOWASSIGN, LOperator.SUBASSIGN,
+    LOperator.ADDASSIGN, LOperator.BITWISEANDASSIGN, LOperator.BITWISEORASSIGN,
+    LOperator.BITWISEXORASSIGN, LOperator.DIVASSIGN, LOperator.MODULOASSIGN,
+    LOperator.MULASSIGN, LOperator.SHIFTLEFTASSIGN, LOperator.SHIFTLEFTOVERFLOWASSIGN,
+    LOperator.SHIFTRIGHTASSIGN, LOperator.SHIFTRIGHTOVERFLOWASSIGN, LOperator.SUBASSIGN,
 ]
 
-def getlocation(symbol: Symbol) -> str:
-    return "%s:%d:%d" % (symbol.ifile, symbol.sline + 1, symbol.scolumn + 1)
+def getlocation(lexem) -> str:
+    return "%s:%d:%d" % (lexem.ifile, lexem.sline + 1, lexem.scolumn + 1)
 
 def asserttype(inputtype: Type, targettype: Type | None, loc: str) -> Type:
+    """
+    Ensure inputtype == targettype, or when targettype == None, infer the type from inputtype
+    """
     if targettype == None:
-        targettype = inputtype
+        return inputtype
     elif targettype.ty != inputtype.ty:
         logging.error("Type mismatch, target type was %s, but expression resulted in %s (at %s)", targettype, inputtype, loc)
         quit()
@@ -40,9 +42,9 @@ class ParseTree:
         
         self.endscope()
 
-        logging.debug("Resulting parse tree")
+        logging.info("Resulting instructions:")
         for entry in self.entries:
-            logging.debug(str(entry))
+            logging.info(str(entry))
     
     def next(self) -> Lexem:
         self.index += 1
@@ -92,7 +94,7 @@ class ParseTree:
                 if type(nextsymbol) is LOperator and nextsymbol.operator == LOperator.ASSIGN:
                     ## let myVar = 10
                     ##             ^^
-                    variabletype, variablevalue = self.parseexpression(vtype = variabletype)
+                    variabletype, variablevalue = self.parseexpression(vtype = variabletype, converttype = True)
 
                     return VariableDefinition(self.createsymbol(variablename, variabletype), variablevalue)
                     print("Variable:", variablename, variabletype, variablevalue)
@@ -103,9 +105,19 @@ class ParseTree:
             nextlexem = self.next()
             if type(nextlexem) is LOperator:
                 if nextlexem.operator in ASSIGNMENT_OPERATORS:
-                    print("Assignment")
-                elif nextlexem.operator == LOperator.INCREMENT or nextlexem.operator == LOperator.DECREMENT:
-                    print("++ or --")
+                    variable = self.findsymbol(lexem.text)
+                    vtype, value = self.parseexpression(variable.vtype)
+                    return VariableAssignment(variable, Operation(Variable(variable), nextlexem, value, vtype))
+                elif nextlexem.operator == LOperator.INCREMENT:
+                    variable = self.findsymbol(lexem.text)
+                    return VariableAssignment(variable, Operation(Variable(variable), LOperator("++", None, LOperator.ADD), Constant(1), variable.vtype))
+                elif nextlexem.operator == LOperator.DECREMENT:
+                    variable = self.findsymbol(lexem.text)
+                    return VariableAssignment(variable, Operation(Variable(variable), LOperator("--", None, LOperator.SUB), Constant(1), variable.vtype))
+                elif nextlexem.operator == LOperator.ASSIGN:
+                    variable = self.findsymbol(lexem.text)
+                    vtype, value = self.parseexpression(variable.vtype)
+                    return VariableAssignment(variable, value)
                 else:
                     logging.error("Invalid operator at %s, expected assignment", getlocation(nextlexem))
                     quit()
@@ -117,24 +129,25 @@ class ParseTree:
                     quit()
 
     
-    def getliteral(self, value, vtype = None):
+    def getliteral(self, value, vtype = None, converttype: bool = False):
         if type(value) is LLiteral:
-            if vtype == None:
-                if value.kind == LLiteral.TYPE_INT:
-                    vtype = Type(Type.INT32)
-                elif value.kind == LLiteral.TYPE_FLOAT:
-                    vtype = Type(Type.FLOAT32)
-                elif value.kind == LLiteral.TYPE_BOOL:
-                    vtype = Type(Type.BOOL)
-                elif value.kind == LLiteral.TYPE_CHAR:
-                    vtype = Type(Type.CHAR)
-                elif value.kind == LLiteral.TYPE_STRING:
-                    vtype = Type(Type.STRING)
-                return vtype, value.value
-            else:
-                return vtype, value.value
+            if value.kind == LLiteral.TYPE_INT:
+                vtype = asserttype(Type(Type.INT32), vtype, getlocation(value)) if not converttype or vtype == None else vtype
+            elif value.kind == LLiteral.TYPE_FLOAT:
+                vtype = asserttype(Type(Type.FLOAT32), vtype, getlocation(value)) if not converttype or vtype == None else vtype
+            elif value.kind == LLiteral.TYPE_BOOL:
+                vtype = asserttype(Type(Type.BOOL), vtype, getlocation(value)) if not converttype or vtype == None else vtype
+            elif value.kind == LLiteral.TYPE_CHAR:
+                vtype = asserttype(Type(Type.CHAR), vtype, getlocation(value)) if not converttype or vtype == None else vtype
+            elif value.kind == LLiteral.TYPE_STRING:
+                vtype = asserttype(Type(Type.STRING), vtype, getlocation(value)) if not converttype or vtype == None else vtype
+            return vtype, value.value
+        else:
+            logging.error("Expected literal at %s", getlocation(value))
+            quit()
+        
 
-    def parseexpression(self, vtype = None):
+    def parseexpression(self, vtype = None, converttype: bool = False):
         leftvtype = None
         leftvalue = None
         operator = None
@@ -142,15 +155,22 @@ class ParseTree:
 
         nextsymbol = self.next()
         if type(nextsymbol) is LLiteral:
-            leftvtype, _vvalue = self.getliteral(nextsymbol, vtype)
+            leftvtype, _vvalue = self.getliteral(nextsymbol, vtype, converttype)
             leftvalue = Constant(_vvalue)
         elif type(nextsymbol) is LIdent:
-            leftvalue = Variable(nextsymbol)
+            variable = self.findsymbol(nextsymbol.text)
+            leftvalue = Variable(variable)
+            leftvtype = variable.vtype
         elif type(nextsymbol) is LOperator:
-            if nextsymbol.operator == LOperator.BITWISENOT:
-                print("~")
-            elif nextsymbol.operator == LOperator.NOT:
-                print("!")
+            if nextsymbol.operator == LOperator.BITWISENOT or nextsymbol.operator == LOperator.NOT:
+                operator = nextsymbol.operator
+                nextsymbol = self.next()
+                if type(nextsymbol) is LLiteral:
+                    leftvtype, literal = self.getliteral(self.next())
+                    leftvalue = Operation(Constant(literal), operator, Constant(1), leftvtype)
+                elif type(nextsymbol) is LIdent:
+                    symbol = self.findsymbol(nextsymbol.text, forceexists = True)
+                    leftvalue = Operation(Variable(symbol), operator, Constant(1), symbol.vtype)
             else:
                 logging.error("Invalid operator at %s", getlocation(nextsymbol))
                 quit()
@@ -163,7 +183,7 @@ class ParseTree:
             
             _vtype, rightvalue = self.parseexpression(vtype)
             if operator.operator >= LOperator.EQUALS and operator.operator <= LOperator.OR:
-                vtype = Type.BOOL
+                vtype = asserttype(Type(Type.BOOL), vtype, getlocation(operator))
             else:
                 vtype = asserttype(leftvtype, vtype, getlocation(operator))
                 vtype = asserttype(_vtype, vtype, getlocation(operator))
@@ -173,12 +193,18 @@ class ParseTree:
             logging.debug("Expression found: %s", leftvalue)
             return leftvtype, leftvalue
 
-    def findsymbol(self, name: str) -> Symbol | None:
+    def findsymbol(self, name: str, forceexists: bool = False) -> Symbol | None:
+        logging.debug("Trying to find symbol %s", repr(name))
         for i in range(len(self.scopestack)):
             scope = self.scopestack[len(self.scopestack) - 1 - i]
             for child in scope.children:
                 if child.name == name:
+                    logging.debug("Found: %s as %s", str(child), child.vtype)
                     return child
+        logging.debug("Symbol did not exist")
+        if forceexists:
+            logging.error("Variable %s not found!", repr(name))
+            quit()
         return None
     
     def startscope(self, name: str):
@@ -187,16 +213,28 @@ class ParseTree:
     def endscope(self):
         self.scopestack.pop()
 
-    def createsymbol(self, name: str, vtype: Type) -> Symbol:
-        symbol = self.findsymbol(name)
-        if symbol != None:
-            logging.error("Symbol %s already exists! (%s)", repr(name), str(scope))
-            quit()
+    def createsymbol(self, name: str, vtype: Type, dontsearch: bool = False) -> Symbol:
+        symbol = None
+        if not dontsearch:
+            symbol = self.findsymbol(name)
+            if symbol != None:
+                logging.error("Symbol %s already exists! (%s)", repr(name), str(scope))
+                quit()
+        
+        logging.debug("Creating symbol %s as %s", repr(name), vtype)
         
         if len(self.scopestack) > 0:
-            return Symbol(name, vtype, self.scopestack[-1])
+            symbol = Symbol(name, vtype, self.scopestack[-1])
         else:
-            return Symbol(name, vtype, None)
+            symbol = Symbol(name, vtype, None)
+        return symbol
+    
+    def findorcreatesymbol(self, name: str, vtype: Type) -> Symbol:
+        symbol = self.findsymbol(name)
+        if symbol == None:
+            return self.createsymbol(name, vtype)
+        else:
+            return symbol
 
 class ParseTreeEntry:
     def __init__(self):

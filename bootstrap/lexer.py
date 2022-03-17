@@ -43,7 +43,8 @@ class DebugInfo:
 class Lexem:
     def __init__(self, text: str, debuginfo: DebugInfo):
         self.text = text
-        self.sline, self.scolumn, self.eline, self.ecolumn, self.ifile = debuginfo.clone()
+        if debuginfo != None:
+            self.sline, self.scolumn, self.eline, self.ecolumn, self.ifile = debuginfo.clone()
     
     def __str__(self) -> str:
         buffer = self.__class__.__name__ + "("

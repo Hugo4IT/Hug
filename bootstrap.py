@@ -8,6 +8,7 @@ Repository: https://github.com/Hugo4IT/Hug
 Description: Entry point for bootstrapper located in bootstrap/compiler.py
 """
 
+import os
 import sys
 import time
 import logging
@@ -37,6 +38,15 @@ class Options:
     def finish(self):
         logger = logging.getLogger()
         logger.setLevel(getattr(logging, self.loglevel))
+
+        if not os.path.exists(os.path.join(os.path.dirname(__file__), "logs")):
+            os.mkdir(os.path.exists(os.path.join(os.path.dirname(__file__), "logs")))
+        elif os.path.exists(os.path.join(os.path.dirname(__file__), "logs", "latest.log")):
+            os.remove(os.path.join(os.path.dirname(__file__), "logs", "latest.log"))
+        filehandler = logging.FileHandler("logs/latest.log", encoding="utf-8")
+        filehandler.setLevel(logging.DEBUG)
+        filehandler.setFormatter(logging.Formatter("%(asctime)s %(module)s:%(lineno)-3d [%(levelname)s]: %(message)s"))
+        logger.addHandler(filehandler)
 
         debughandler = logging.StreamHandler()
         debughandler.setLevel(logging.DEBUG)
@@ -74,6 +84,13 @@ class Options:
 
         if self.inputfile == "":
             logging.critical("No input file given!")
+            quit()
+        
+        logging.info("Detected options:")
+        logging.info("  loglevel:  %s", self.loglevel)
+        logging.info("  inputfile: %s", self.inputfile)
+        logging.info("  highlight: %s", self.highlight)
+        logging.info("  yestoall:  %s", self.yestoall)
 
 def printusage():
     print(colorama.Style.BRIGHT + "Usage:")

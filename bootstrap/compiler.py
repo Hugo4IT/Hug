@@ -15,7 +15,7 @@ from .syntax import ParseTree
 from .symbol import SymbolTable
 
 def compile(options):
-    logging.info("Input file received: %s", colorama.Style.BRIGHT + colorama.Fore.LIGHTYELLOW_EX + options.inputfile)
+    logging.info("Input file received: %s", options.inputfile)
     logging.info("Entering phase 1 - Lexical Analysis")
 
     lexer = Lexer(options, options.inputfile)

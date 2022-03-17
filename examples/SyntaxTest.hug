@@ -1,8 +1,70 @@
+let variable = 4.4
+if true {}
+
+let int8Test: Int8 = 10
+let int16Test: Int16 = 10
+let int32Test = 10
+let int64Test: Int64 = 10
+let int128Test: Int128 = 10
+let intArchTest: IntArch = 10
+let uint8Test: UInt8 = 10
+let uint16Test: UInt16 = 10
+let uint32Test: UInt32 = 10
+let uint64Test: UInt64 = 10
+let uint128Test: UInt128 = 10
+let uintArchTest: UIntArch = 10
+let float32Test = 809354.24379
+let float64Test: Float64 = 9430798570.25908
+let charTest = 'W'
+let stringTest = "wowie"
+
+let result = 5 + 9
+result = 25 - 13
+result = 3 * 5
+result = 9 / 3
+result = 10
+result += 50
+result -= 60
+result *= 70
+result /= 8
+result = 1 << 16
+result = 1 >> 16
+result = 1 <<< 16
+result = 1 >>> 16
+result <<= 16
+result >>= 16
+result <<<= 16
+result >>>= 16
+result = 7 & 5
+result &= 3
+result = 5 | 8
+result |= 3
+result = 3 ^ 5
+result ^= 9
+result = ~result
+result = 86 % 50
+result %= 2
+result++
+result--
+
+let isFifteen = result == 15
+let isNotFifteen = result != 15
+let alwaysTrue = isFifteen || isNotFifteen
+let alwaysFalse = alwaysTrue && !alwaysTrue
+let aboveOrEqualToOneresult = result >= 1
+let underOrEqualToEight = result <= 8
+let aboveZero = result > 0
+let underNine = result < 9
+
 // variable definition
 let myVar = 10
 
-if myVar == 10 {
-    print("poggers")
-} else {
-    print("what the hell happened here")
-}
+//if myVar == 10 {
+//    print("poggers")
+//} else {
+//    print("what the hell happened here")
+//}
+
+// Complex assignment
+result += result % 50 + 10
+let another = 90.0 / 50.0 * 3.0
