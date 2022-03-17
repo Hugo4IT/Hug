@@ -191,9 +191,9 @@ class LMisc(Lexem):
     COMMA = 7                       # ,
     DOT = 8                         # .
 
-    def __init__(self, text: str, debuginfo: DebugInfo, value: int):
+    def __init__(self, text: str, debuginfo: DebugInfo, kind: int):
         super().__init__(text, debuginfo)
-        self.value = value
+        self.kind = kind
 
 class Lexer:
     def __init__(self, options, filepath):

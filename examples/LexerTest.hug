@@ -26,10 +26,10 @@
 /* ✅ */ let uint16Test: UInt16 = 10
 /* ✅ */ let uint32Test: UInt32 = 10
 /* ✅ */ let uint64Test: UInt64 = 10
-/* ✅ */ let uint128Test UInt128 = 10
+/* ✅ */ let uint128Test: UInt128 = 10
 /* ✅ */ let uintArchTest: UIntArch = 10
-/* ✅ */ let float32Test: Float32 = 809354.24379
-/* ✅ */ let float64Test = 9430798570.25908
+/* ✅ */ let float32Test = 809354.24379
+/* ✅ */ let float64Test: Float64 = 9430798570.25908
 /* ✅ */ let charTest = 'W'
 /* ✅ */ let stringTest = "wowie"
 
@@ -68,7 +68,7 @@
 /* ✅ */ let isNotFifteen = result != 15
 /* ✅ */ let alwaysTrue = isFifteen || isNotFifteen
 /* ✅ */ let alwaysFalse = alwaysTrue && !alwaysTrue
-/* ✅ */ let aboveOrEqualToOneresult >= 1
-/* ✅ */ let underOrEqualToEight <= 8
+/* ✅ */ let aboveOrEqualToOneresult = result >= 1
+/* ✅ */ let underOrEqualToEight = result <= 8
 /* ✅ */ let aboveZero = result > 0
 /* ✅ */ let underNine = result < 9

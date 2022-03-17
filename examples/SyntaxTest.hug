@@ -1,0 +1,8 @@
+// variable definition
+let myVar = 10
+
+if myVar == 10 {
+    print("poggers")
+} else {
+    print("what the hell happened here")
+}

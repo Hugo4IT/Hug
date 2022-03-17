@@ -32,6 +32,7 @@ class Options:
         self.loglevel = "WARNING"
         self.inputfile = ""
         self.highlight = False
+        self.yestoall = False
 
     def finish(self):
         logger = logging.getLogger()
@@ -63,7 +64,7 @@ class Options:
         errorhandler = logging.StreamHandler()
         errorhandler.setLevel(logging.ERROR)
         errorhandler.addFilter(lambda r: r.levelno == logging.ERROR or r.levelno == logging.CRITICAL)
-        errorhandler.setFormatter(logging.Formatter(LOGGING_FMT_BASE.replace("$$LOG_COLOR$$", colorama.Style.BRIGHT + colorama.Fore.LIGHTRED_EX)))
+        errorhandler.setFormatter(logging.Formatter(LOGGING_FMT_BASE.replace("$$LOG_COLOR$$", colorama.Fore.YELLOW + "Called from %(pathname)s:%(lineno)s " + colorama.Style.RESET_ALL + colorama.Style.BRIGHT + colorama.Fore.LIGHTRED_EX + "\n")))
         logger.addHandler(errorhandler)
 
         self.errorcounter = CountHandler()
@@ -84,6 +85,7 @@ def printusage():
     print("  --version,-V                Print the current version of bootstrap.py")
     print("  --log-level,-l <level>      Increase/decrease output verbosity (<level>: [error, warning, info, debug])")
     print("  --highlight-syntax,-H       Print a syntax highlighted version of your code")
+    print("  --yes-to-all,-y             Automatically answer 'y' to all questions")
 
 def main():
     options = Options()
@@ -104,6 +106,8 @@ def main():
                     return
                 elif arg == "--highlight-syntax" or arg == "-H":
                     options.highlight = True
+                elif arg == "--yes-to-all" or arg == "-y":
+                    options.yestoall = True
                 else:
                     currentarg = arg
             else:

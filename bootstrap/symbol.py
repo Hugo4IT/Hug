@@ -83,7 +83,7 @@ class Type:
     ARRAY = 19
     STRUCT = 20
 
-    SCOPE = 19
+    SCOPE = 21
 
     def __init__(self, ty: int, resulttype = None, arraytype = None, size: int = 0, identity = None, values: list = []):
         self.ty = ty
@@ -100,6 +100,16 @@ class Type:
             if resulttype == None:
                 raise Exception()
             self.resulttype = resulttype
+
+    def fromstring(string: str):
+        VALID_TYPES = [ "Int8",  "Int16",  "Int32",  "Int64",   "Int128",  "IntArch",
+                        "UInt8", "UInt16", "UInt32", "UInt64",  "UInt128", "UIntArch",
+                        "Float32", "Float64", "Char", "String", "Bool" ]
+        if string in VALID_TYPES:
+            return Type(VALID_TYPES.index(string))
+        else:
+            logging.error("Invalid type: %s", string)
+            quit()
     
     def __str__(self) -> str:
         if self.ty == Type.INT8: return "Int8"
@@ -114,6 +124,8 @@ class Type:
         elif self.ty == Type.UINT64: return "UInt64"
         elif self.ty == Type.UINT128: return "UInt128"
         elif self.ty == Type.UINTARCH: return "UIntArch"
+        elif self.ty == Type.FLOAT32: return "Float32"
+        elif self.ty == Type.FLOAT64: return "Float64"
         elif self.ty == Type.CHAR: return "Char"
         elif self.ty == Type.STRING: return "String"
         elif self.ty == Type.BOOL: return "Bool"
@@ -143,3 +155,9 @@ class Symbol:
     
     def appendchild(self, child):
         self.children.append(child)
+    
+    def __str__(self) -> str:
+        if self.scope == None:
+            return self.name
+        else:
+            return str(self.scope) + "." + self.name

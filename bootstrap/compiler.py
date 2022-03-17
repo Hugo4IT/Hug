@@ -12,7 +12,7 @@ import logging
 import colorama
 from .lexer import Lexer
 from .syntax import ParseTree
-from .ident import SymbolTable
+from .symbol import SymbolTable
 
 def compile(options):
     logging.info("Input file received: %s", colorama.Style.BRIGHT + colorama.Fore.LIGHTYELLOW_EX + options.inputfile)
@@ -25,7 +25,7 @@ def compile(options):
         print(lexer.highlight())
     
     lexer.trim()
-    if options.errorcounter.count > 0:
+    if options.errorcounter.count > 0 and not options.yestoall:
         while True:
             answer = input("%d error(s) occured during phase 1 of compiling, continue? (y/N)" % options.errorcounter.count).lower()
             if answer == "no" or answer == "n" or answer == "":
