@@ -94,7 +94,7 @@ class Options:
 
 def printusage():
     print(colorama.Style.BRIGHT + "Usage:")
-    print(colorama.Fore.MAGENTA + "  python3" + colorama.Style.RESET_ALL + colorama.Style.DIM + " ./bootstrap.py" + colorama.Style.RESET_ALL + "[options] <file>")
+    print(colorama.Fore.MAGENTA + "  python3" + colorama.Style.RESET_ALL + colorama.Style.DIM + " ./bootstrap.py " + colorama.Style.RESET_ALL + "[options] <file>")
     print()
     print("Available options:")
     print("  --verbose,-v                Enable verbose output (same as --log-level INFO)")
