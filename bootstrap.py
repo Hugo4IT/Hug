@@ -40,7 +40,7 @@ class Options:
         logger.setLevel(getattr(logging, self.loglevel))
 
         if not os.path.exists(os.path.join(os.path.dirname(__file__), "logs")):
-            os.mkdir(os.path.exists(os.path.join(os.path.dirname(__file__), "logs")))
+            os.mkdir(os.path.join(os.path.dirname(__file__), "logs"))
         elif os.path.exists(os.path.join(os.path.dirname(__file__), "logs", "latest.log")):
             os.remove(os.path.join(os.path.dirname(__file__), "logs", "latest.log"))
         filehandler = logging.FileHandler("logs/latest.log", encoding="utf-8")
