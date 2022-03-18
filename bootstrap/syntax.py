@@ -113,6 +113,8 @@ class ParseTree:
                     iffalse = self.parsescope()
 
                 return ConditionalJump(condition, iftrue, iffalse)
+            else:
+                logging.error("Sorry, but %s is a reserved keyword and may not be used as identitifer", repr(lexem.text))
         elif type(lexem) is LIdent:
             nextlexem = self.next()
             if type(nextlexem) is LOperator:
