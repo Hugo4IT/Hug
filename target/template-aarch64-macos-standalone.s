@@ -1,4 +1,4 @@
-// Compile, link and run: arch -arm64 as ./target/template-aarch64-macos-standalone.s -o ./bin/template-aarch64-macos-standalone.o && ld ./bin/template-aarch64-macos-standalone.o -o ./bin/out -lSystem -syslibroot `xcrun -sdk macosx --show-sdk-path` -e _start -arch arm64  && ./bin/out
+// Compile, link and run: as -arch arm64 ./target/template-aarch64-macos-standalone.s -o ./bin/template-aarch64-macos-standalone.o && ld ./bin/template-aarch64-macos-standalone.o -o ./bin/out -lSystem -syslibroot `xcrun -sdk macosx --show-sdk-path` -e _start -arch arm64  && ./bin/out
 
 .global _start
 .align 4

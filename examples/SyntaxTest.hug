@@ -18,6 +18,11 @@ let float64Test: Float64 = 9430798570.25908
 let charTest = 'W'
 let stringTest = "wowie"
 
+let typeAliasTestInt: int = 9
+let typeAliasTestUInt: uint = 9
+let typeAliasTestFloat: float = 9.0
+let typeAliasTestChar: char = 'E'
+
 let result = 5 + 9
 result = 25 - 13
 result = 3 * 5
@@ -44,8 +49,10 @@ result ^= 9
 result = ~result
 result = 86 % 50
 result %= 2
-result++
-result--
+//result++
+//result--
+//++result
+//--result
 
 let isFifteen = result == 15
 let isNotFifteen = result != 15
@@ -61,12 +68,49 @@ let myVar = 10
 
 if myVar == 10 {
     let scopedVariableTest = 10.0
-    print("poggers")
+    if myVar == 10 {
+        let anotherScopedVariableTest = 10.0
+    } else {
+        let anotherScopedVariableTest = 5
+        print("what the hell happened here")
+        if myVar == 10 {
+            let anotherAnotherScopedVariableTest = 10.0
+        } else {
+            let anotherAnotherScopedVariableTest = 5
+        }
+    }
 } else {
     let scopedVariableTest = 5
-    print("what the hell happened here")
 }
 
 // Complex assignment
 result += result % 50 + 10
 pub let another = 90.0 / 50.0 * 3.0
+
+{
+    let testVariable = 10
+} // testVariable is now discarded, as it was located in an anonymous scope
+
+let testVariable = 60 // So the variable name can be used again, in the global scope
+
+//fn add(left: int, right: int) {
+//    left + right
+//}
+
+// More generics
+//fn add<T: Add>(left: T, right: T) -> T {
+//    left + right
+//}
+
+//fn add: Int32 = (left: Int32, right: Int32) {
+//    return left + right
+//}
+
+//let calculation1 = add(15, 5)
+
+let left = 10
+let right = 5
+//let calculation2 = add(left, right)
+
+let anotherLeft = 7
+//let calculation3 = add(anotherLeft, 7)

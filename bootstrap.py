@@ -43,7 +43,7 @@ class Options:
             os.mkdir(os.path.join(os.path.dirname(__file__), "logs"))
         elif os.path.exists(os.path.join(os.path.dirname(__file__), "logs", "latest.log")):
             os.remove(os.path.join(os.path.dirname(__file__), "logs", "latest.log"))
-        filehandler = logging.FileHandler("logs/latest.log", encoding="utf-8")
+        filehandler = logging.FileHandler(os.path.dirname(__file__) + "/logs/latest.log", encoding="utf-8")
         filehandler.setLevel(logging.DEBUG)
         filehandler.setFormatter(logging.Formatter("%(asctime)s %(module)10s:%(lineno)-3d [%(levelname)s]: %(message)s"))
         logger.addHandler(filehandler)

@@ -114,6 +114,8 @@ class LLiteral(Lexem):
     
     @staticmethod
     def parse(text: str):
+        # TODO: Implement `0b`, `0x` and `0o` for binary, hexadecimal and octal literal representations
+
         if text.startswith("\"") and text.endswith("\""):
             if len(text) >= 3:
                 return text[1:len(text)-1], LLiteral.TYPE_STRING # String

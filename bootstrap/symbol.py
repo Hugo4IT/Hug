@@ -54,6 +54,7 @@ class SymbolTable:
             buffer += "-" * (longestitem + 2) + "+"
         return buffer
 
+# Probably some more very stupid python code but it works for now
 class Type:
     INT8 = 0
     INT16 = 1
@@ -108,6 +109,14 @@ class Type:
         if string in VALID_TYPES:
             return Type(VALID_TYPES.index(string))
         else:
+            if string == "int":
+                return Type(Type.INT32)
+            elif string == "uint":
+                return Type(Type.UINT32)
+            elif string == "float":
+                return Type(Type.FLOAT32)
+            elif string == "char":
+                return Type(Type.CHAR)
             logging.error("Invalid type: %s", string)
             quit()
     
@@ -129,8 +138,8 @@ class Type:
         elif self.ty == Type.CHAR: return "Char"
         elif self.ty == Type.STRING: return "String"
         elif self.ty == Type.BOOL: return "Bool"
-        elif self.ty == Type.FUNCTION: return "Function"
-        elif self.ty == Type.POINTER: return "Pointer"
+        elif self.ty == Type.FUNCTION: return f"Function() -> {self.resulttype}"
+        elif self.ty == Type.POINTER: return f"Pointer({self.resulttype})"
         elif self.ty == Type.ARRAY: return f"{str(self.arraytype)}[{self.arraylength}]"
         elif self.ty == Type.STRUCT:
             buffer = ""
