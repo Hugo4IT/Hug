@@ -45,7 +45,7 @@ class Options:
             os.remove(os.path.join(os.path.dirname(__file__), "logs", "latest.log"))
         filehandler = logging.FileHandler("logs/latest.log", encoding="utf-8")
         filehandler.setLevel(logging.DEBUG)
-        filehandler.setFormatter(logging.Formatter("%(asctime)s %(module)s:%(lineno)-3d [%(levelname)s]: %(message)s"))
+        filehandler.setFormatter(logging.Formatter("%(asctime)s %(module)10s:%(lineno)-3d [%(levelname)s]: %(message)s"))
         logger.addHandler(filehandler)
 
         debughandler = logging.StreamHandler()

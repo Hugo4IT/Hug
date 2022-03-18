@@ -3,8 +3,16 @@ import colorama
 import logging
 
 KEYWORDS = [
-    "let",
-    "if",
+    "let",      # Variable definition
+    "if",       # Conditional jump
+    "else",     # Inverse conditional jump
+    "for",      # Iterator part 1
+    "in",       # Iterator part 2
+    "extern",   # Function/variable imported from another compiled language
+    "struct",   # A collection of primitive types
+    "pub",      # Make following expression public
+    "fn",       # Function definition
+    "as",       # Converting between primitives
 ]
 
 HIGHLIGHT_COLORS = [
@@ -422,14 +430,11 @@ class Lexer:
         _lexems = []
         for lexem in self.lexems:
             if type(lexem) == LComment:
-                logging.debug("Removing: %s", str(lexem))
                 comments += 1
             elif type(lexem) == LWhitespace:
-                logging.debug("Removing: %s", str(lexem))
                 whitespaces += 1
             elif type(lexem) == LUnknown:
                 logging.error("Unknown token: %s (in %s:%d:%d)", repr(lexem.text), self.filepath, lexem.sline, lexem.scolumn)
-                logging.debug("Removing: %s", str(lexem))
                 unknowns += 1
             else:
                 _lexems.append(lexem)

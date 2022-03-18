@@ -59,12 +59,14 @@ let underNine = result < 9
 // variable definition
 let myVar = 10
 
-//if myVar == 10 {
-//    print("poggers")
-//} else {
-//    print("what the hell happened here")
-//}
+if myVar == 10 {
+    let scopedVariableTest = 10.0
+    print("poggers")
+} else {
+    let scopedVariableTest = 5
+    print("what the hell happened here")
+}
 
 // Complex assignment
 result += result % 50 + 10
-let another = 90.0 / 50.0 * 3.0
+pub let another = 90.0 / 50.0 * 3.0

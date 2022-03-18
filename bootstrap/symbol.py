@@ -32,25 +32,25 @@ class SymbolTable:
         longestvtype = len("type")
         longestscope = len("scope")
         for ident in self.idents:
-            _id, name, vtype, scope = [str(getattr(ident, key)) for key in ["_id", "name", "vtype", "scope"]]
+            _id, name, vtype, scope, ispublic = [str(getattr(ident, key)) for key in ["_id", "name", "vtype", "scope", "ispublic"]]
             longestid = max(longestid, len(_id))
             longestname = max(longestname, len(name))
             longestvtype = max(longestvtype, len(vtype))
             longestscope = max(longestscope, len(scope))
-            rows.append((_id, name, vtype, scope))
+            rows.append((_id, name, vtype, scope, ispublic))
         buffer = "+"
-        for longestitem in [longestid, longestname, longestvtype, longestscope]:
+        for longestitem in [longestid, longestname, longestvtype, longestscope, 5]:
             buffer += "-" * (longestitem + 2) + "+"
-        buffer += f"\n| id{' ' * (longestid - 2)} | name{' ' * (longestname - 4)} | type{' ' * (longestvtype - 4)} | scope{' ' * (longestscope - 5)} |"
+        buffer += f"\n| id{' ' * (longestid - 2)} | name{' ' * (longestname - 4)} | type{' ' * (longestvtype - 4)} | scope{' ' * (longestscope - 5)} | pub   |"
         buffer += "\n+"
-        for longestitem in [longestid, longestname, longestvtype, longestscope]:
+        for longestitem in [longestid, longestname, longestvtype, longestscope, 5]:
             buffer += "=" * (longestitem + 2) + "+"
         for row in rows:
             buffer += "\n|"
-            for column,longestitem in zip(row, [longestid, longestname, longestvtype, longestscope]):
+            for column,longestitem in zip(row, [longestid, longestname, longestvtype, longestscope, 5]):
                 buffer += " " + column + " " * (longestitem - len(column) + 1) + "|"
         buffer += "\n+"
-        for longestitem in [longestid, longestname, longestvtype, longestscope]:
+        for longestitem in [longestid, longestname, longestvtype, longestscope, 5]:
             buffer += "-" * (longestitem + 2) + "+"
         return buffer
 
@@ -139,16 +139,20 @@ class Type:
             else:
                 buffer = f"struct {str(self.structidentity)} {{VALUES}}"
             return buffer.replace("VALUES", ", ".join([f"{i.name}: {i.vtype}" for i in self.structvalues]))
-        elif self.ty == Type.SCOPE: return "scope"
+        elif self.ty == Type.SCOPE: return "Scope"
         else: return "INVALID"
 
 class Symbol:
-    def __init__(self, name: str, vtype: Type, scope):
+    def __init__(self, name: str, vtype: Type, scope, ispublic: bool = False):
         self.name = name
         self.vtype = vtype
         self.scope = scope
         self._id = SymbolTable.push(self)
+        self.ispublic = ispublic
 
+        if self.name == "":
+            self.name = f"<anonymous {self._id}>"
+        
         self.children = []
         if scope != None:
             scope.appendchild(self)

@@ -31,6 +31,7 @@ class ParseTree:
         self.scopestack = []
         self.lexems = lexer.lexems
         self.index = -1
+        self.ispublic = False
 
         self.startscope("__HUG__main")
 
@@ -97,10 +98,21 @@ class ParseTree:
                     variabletype, variablevalue = self.parseexpression(vtype = variabletype, converttype = True)
 
                     return VariableDefinition(self.createsymbol(variablename, variabletype), variablevalue)
-                    print("Variable:", variablename, variabletype, variablevalue)
                 else:
                     logging.error("Expected : or = at %s", getlocation(nextsymbol))
                     quit()
+            elif lexem.text == "pub":
+                self.flagpublic()
+                return self.next_entry()
+            elif lexem.text == "if":
+                resultingtype, condition = self.parseexpression(vtype=Type(Type.BOOL))
+                iftrue = self.parsescope()
+                iffalse = None
+                if type(self.peek(1)) is LKeyword and self.peek(1).text == "else":
+                    self.next()
+                    iffalse = self.parsescope()
+
+                return ConditionalJump(condition, iftrue, iffalse)
         elif type(lexem) is LIdent:
             nextlexem = self.next()
             if type(nextlexem) is LOperator:
@@ -181,10 +193,11 @@ class ParseTree:
         if type(self.peek(1)) is LOperator:
             operator = self.next()
             
-            _vtype, rightvalue = self.parseexpression(vtype)
             if operator.operator >= LOperator.EQUALS and operator.operator <= LOperator.OR:
-                vtype = asserttype(Type(Type.BOOL), vtype, getlocation(operator))
+                _vtype, rightvalue = self.parseexpression(leftvtype)
+                vtype = Type(Type.BOOL)
             else:
+                _vtype, rightvalue = self.parseexpression(vtype)
                 vtype = asserttype(leftvtype, vtype, getlocation(operator))
                 vtype = asserttype(_vtype, vtype, getlocation(operator))
             logging.debug("Math expression found: %s %s %s", leftvalue, operator, rightvalue)
@@ -192,6 +205,37 @@ class ParseTree:
         else:
             logging.debug("Expression found: %s", leftvalue)
             return leftvtype, leftvalue
+
+    def parsescope(self, name: str = ""):
+        nextlexem = self.next()
+        if type(nextlexem) is not LMisc or nextlexem.kind != LMisc.OPENBRACE:
+            logging.error("Expected code block at %s", getlocation(nextlexem))
+
+        self.startscope(name)
+
+        entries = []
+        while self.index < len(self.lexems):
+            peek = self.peek(1)
+            if type(peek) is LMisc and peek.kind == LMisc.CLOSEBRACE:
+                self.next()
+                break
+            
+            entry = self.next_entry()
+            if entry != None:
+                logging.debug("Resulting ParseTreeEntry: %s", entry)
+                entries.append(entry)
+
+        scope = self.endscope()
+
+        return CodeBlock(scope, entries)
+
+    def flagpublic(self):
+        self.ispublic = True
+    
+    def getpublic(self) -> bool:
+        _p = self.ispublic
+        self.ispublic = False
+        return _p
 
     def findsymbol(self, name: str, forceexists: bool = False) -> Symbol | None:
         logging.debug("Trying to find symbol %s", repr(name))
@@ -211,7 +255,7 @@ class ParseTree:
         self.scopestack.append(self.createsymbol(name, Type(Type.SCOPE)))
     
     def endscope(self):
-        self.scopestack.pop()
+        return self.scopestack.pop()
 
     def createsymbol(self, name: str, vtype: Type, dontsearch: bool = False) -> Symbol:
         symbol = None
@@ -224,9 +268,9 @@ class ParseTree:
         logging.debug("Creating symbol %s as %s", repr(name), vtype)
         
         if len(self.scopestack) > 0:
-            symbol = Symbol(name, vtype, self.scopestack[-1])
+            symbol = Symbol(name, vtype, self.scopestack[-1], self.getpublic())
         else:
-            symbol = Symbol(name, vtype, None)
+            symbol = Symbol(name, vtype, None, self.getpublic())
         return symbol
     
     def findorcreatesymbol(self, name: str, vtype: Type) -> Symbol:
@@ -295,3 +339,19 @@ class VariableAssignment(ParseTreeEntry):
 
     def __str__(self) -> str:
         return f"VariableAssignment: {self.var} = {self.value}"
+
+class ConditionalJump(ParseTreeEntry):
+    def __init__(self, condition: Expression, iftrue: Symbol, iffalse: Symbol | None):
+        super().__init__()
+        self.condition = condition
+        self.iftrue = iftrue
+        self.iffalse = iffalse
+    
+    def __str__(self) -> str:
+        return f"ConditionalJump: if {self.condition} {{ {self.iftrue} }} else {{ {self.iffalse} }}"
+
+class CodeBlock(ParseTreeEntry):
+    def __init__(self, symbol: Symbol, entries: list[ParseTreeEntry]):
+        super().__init__()
+        self.symbol = symbol
+        self.entries = entries
